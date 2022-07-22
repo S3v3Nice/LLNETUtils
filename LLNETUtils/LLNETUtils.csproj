@@ -14,7 +14,11 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="YamlDotNet" Version="11.2.1"/>
+        <PackageReference Include="YamlDotNet" Version="11.2.1" />
     </ItemGroup>
+
+    <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+      <Exec Command="if exist copy_build.cmd copy_build.cmd" />
+    </Target>
 
 </Project>

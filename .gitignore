@@ -1,0 +1,7 @@
+.vs
+.idea
+*.sln.DotSettings.user
+*.csproj.user
+bin/
+obj/
+copy_build.cmd
