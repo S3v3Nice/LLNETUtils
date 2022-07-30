@@ -1,11 +1,14 @@
 ﻿# LLNETUtils
+
+##### English | [Русский](README_ru.md)
+
 Library for [LiteLoader.NET](https://github.com/LiteLDev/LiteLoader.NET) for easier plugin development. It provides features such as:
 - Saving plugin resources to the plugin data folder
 - Reading and editing `YAML`, `JSON` and `Properties` configs
 
 ## Getting started
 1. Download the latest <code>LLNETUtils-<i>version</i>.zip</code> from [Releases](https://github.com/S3v3Nice/LLNETUtils/releases)
-2. Unzip all files to `plugins/lib` in the server directory.
+2. Unzip all files to `plugins/lib` in the server directory
 3. Add `LLNETUtils.dll` to the project references
 4. Make your main plugin class inherit the `PluginBase` class:
 
@@ -63,7 +66,7 @@ var config = new Config();
 // Load from a file
 config.Load(Path.Join(DataPath, "en_US.json"));
 // Load from a stream
-config.Load(GetResource("en_US.json")!);
+config.Load(GetResource("en_US.json")!, ConfigType.Json);
 ```
 
 > If you are working with `config.yml`, you don't have to create an instance of the `Config` class and load it, just use the `Config` property of the `PluginBase` class.
