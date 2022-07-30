@@ -33,7 +33,10 @@ public class Config
         Logger = logger;
         Root = new ConfigSection();
 
-        Load(FilePath, Type);
+        if (!string.IsNullOrEmpty(filePath))
+        {
+            Load(FilePath, Type);
+        }
     }
 
     public string FilePath { get; set; }
