@@ -1,6 +1,6 @@
 ﻿namespace LLNETUtils.Configuration.Serialization;
 
-public interface IConfigSerializer
+internal interface IConfigSerializer
 {
     ConfigSection Deserialize(string data);
 

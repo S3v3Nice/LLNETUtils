@@ -6,15 +6,10 @@ using YamlDotNet.Serialization.EventEmitters;
 
 namespace LLNETUtils.Configuration.Serialization;
 
-public class YamlConfigSerializer : IConfigSerializer
+internal class YamlConfigSerializer : IConfigSerializer
 {
     public ConfigSection Deserialize(string data)
     {
-        /*if (string.IsNullOrEmpty(data))
-        {
-            throw new ArgumentException("YAML data must not be empty");
-        }*/
-
         IDeserializer deserializer = new DeserializerBuilder()
             .WithNodeTypeResolver(new ConfigNodeTypeResolver())
             .Build();

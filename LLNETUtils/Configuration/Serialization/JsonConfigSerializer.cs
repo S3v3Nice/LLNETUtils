@@ -4,7 +4,7 @@ using System.Text.Unicode;
 
 namespace LLNETUtils.Configuration.Serialization;
 
-public class JsonConfigSerializer : IConfigSerializer
+internal class JsonConfigSerializer : IConfigSerializer
 {
     public ConfigSection Deserialize(string data)
     {

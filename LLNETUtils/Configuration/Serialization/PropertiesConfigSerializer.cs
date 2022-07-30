@@ -4,7 +4,7 @@ using System.Text.RegularExpressions;
 
 namespace LLNETUtils.Configuration.Serialization;
 
-public class PropertiesConfigSerializer : IConfigSerializer
+internal class PropertiesConfigSerializer : IConfigSerializer
 {
     public ConfigSection Deserialize(string data)
     {
