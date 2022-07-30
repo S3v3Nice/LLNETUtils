@@ -13,7 +13,14 @@ internal class YamlConfigSerializer : IConfigSerializer
         IDeserializer deserializer = new DeserializerBuilder()
             .WithNodeTypeResolver(new ConfigNodeTypeResolver())
             .Build();
-        return deserializer.Deserialize<ConfigSection>(data);
+        ConfigSection? result = deserializer.Deserialize<ConfigSection?>(data);
+        
+        if (result == null)
+        {
+            throw new ArgumentException("The data provided is not a valid Yaml object!");
+        }
+        
+        return result;
     }
 
     public string Serialize(ConfigSection section)
@@ -21,6 +28,7 @@ internal class YamlConfigSerializer : IConfigSerializer
         ISerializer serializer = new SerializerBuilder()
             .WithEventEmitter(emitter => new ForceQuoteEventEmitter(emitter))
             .Build();
+        
         return serializer.Serialize(section);
     }
 
