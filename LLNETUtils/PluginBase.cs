@@ -106,28 +106,30 @@ public abstract class PluginBase : IPluginInitializer
         {
             Stream? resource = GetResource(resourcePath);
 
-            if (resource != null)
+            if (resource == null)
             {
-                DirectoryInfo? outputFolder = output.Directory;
-                if (outputFolder != null && !outputFolder.Exists)
-                {
-                    outputFolder.Create();
-                }
-
-                using FileStream fileStream = output.OpenWrite();
-                resource.Seek(0, SeekOrigin.Begin);
-                fileStream.SetLength(0);
-                resource.CopyTo(fileStream);
-
-                return true;
+                Logger.error.WriteLine($"Could not save resource '{resourcePath}':\nNo such embedded resource in assembly!");
+                return false;
             }
-        }
-        catch (IOException e)
-        {
-            Logger.error.WriteLine(e);
-        }
 
-        return false;
+            DirectoryInfo? outputFolder = output.Directory;
+            if (outputFolder != null && !outputFolder.Exists)
+            {
+                outputFolder.Create();
+            }
+
+            using FileStream fileStream = output.OpenWrite();
+            resource.Seek(0, SeekOrigin.Begin);
+            fileStream.SetLength(0);
+            resource.CopyTo(fileStream);
+
+            return true;
+        }
+        catch (Exception e)
+        {
+            Logger.error.WriteLine($"Could not save resource '{resourcePath}':\n{e}");
+            return false;
+        }
     }
 
     /**
@@ -135,10 +137,7 @@ public abstract class PluginBase : IPluginInitializer
      */
     public void ReloadConfig()
     {
-        if (!Config.Reload())
-        {
-            Logger.error.WriteLine($"Could not load config from {Config.FilePath}");
-        }
+        Config.Reload();
     }
 
     /**
@@ -149,10 +148,7 @@ public abstract class PluginBase : IPluginInitializer
      */
     public void SaveConfig()
     {
-        if (!Config.Save())
-        {
-            Logger.error.WriteLine($"Could not save config to {Config.FilePath}");
-        }
+        Config.Save();
     }
 
     /**
@@ -164,9 +160,6 @@ public abstract class PluginBase : IPluginInitializer
      */
     public void SaveDefaultConfig(bool replace = false)
     {
-        if (!SaveResource(ConfigResourcePath, replace))
-        {
-            Logger.error.WriteLine($"Could not save default config ({ConfigResourcePath})");
-        }
+        SaveResource(ConfigResourcePath, replace);
     }
 }

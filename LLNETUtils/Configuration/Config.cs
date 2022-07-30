@@ -77,6 +77,7 @@ public class Config
     {
         if (!File.Exists(filePath))
         {
+            Logger?.Error.WriteLine($"Could not load {Type} config from a file '{filePath}':\nNo such file!");
             return false;
         }
 
@@ -100,10 +101,9 @@ public class Config
         }
         catch (Exception e)
         {
-            Logger?.Error.WriteLine(e);
+            Logger?.Error.WriteLine($"Could not load {Type} config from a file '{filePath}':\n{e}");
             return false;
         }
-
 
         FilePath = filePath;
         return true;
@@ -124,7 +124,7 @@ public class Config
         }
         catch (Exception e)
         {
-            Logger?.Error.WriteLine(e);
+            Logger?.Error.WriteLine($"Could not load {Type} config from a stream:\n{e}");
             return false;
         }
 
@@ -152,7 +152,7 @@ public class Config
             }
             catch (Exception e)
             {
-                Logger?.Error.WriteLine(e);
+                Logger?.Error.WriteLine($"Could not save {Type} config to '{filePath}':\n{e}");
                 return false;
             }
         }
