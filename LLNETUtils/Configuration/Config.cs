@@ -3,16 +3,16 @@ using LLNETUtils.Configuration.Serialization;
 
 namespace LLNETUtils.Configuration;
 
+public enum ConfigType
+{
+    Undefined,
+    Yaml,
+    Json,
+    Properties
+}
+
 public class Config
 {
-    public enum ConfigType
-    {
-        Undefined,
-        Yaml,
-        Json,
-        Properties
-    }
-
     private static readonly Dictionary<string, ConfigType> FormatTypes = new()
     {
         {".yml", ConfigType.Yaml},
