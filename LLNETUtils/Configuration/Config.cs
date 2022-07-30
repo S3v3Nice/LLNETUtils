@@ -54,7 +54,6 @@ public class Config
 
             switch (_type)
             {
-                case ConfigType.Undefined:
                 case ConfigType.Yaml:
                     _serializer = new YamlConfigSerializer();
                     break;
@@ -85,13 +84,9 @@ public class Config
         {
             Type = type;
         }
-        else
+        else if (Type == ConfigType.Undefined)
         {
-            if (Type == ConfigType.Undefined)
-            {
-                FormatTypes.TryGetValue(Path.GetExtension(filePath), out type);
-                Type = type;
-            }
+            Type = FormatTypes.GetValueOrDefault(Path.GetExtension(filePath), ConfigType.Yaml);
         }
 
         try
@@ -114,6 +109,10 @@ public class Config
         if (type != ConfigType.Undefined)
         {
             Type = type;
+        }
+        else if (Type == ConfigType.Undefined)
+        {
+            Type = ConfigType.Yaml;
         }
 
         try
