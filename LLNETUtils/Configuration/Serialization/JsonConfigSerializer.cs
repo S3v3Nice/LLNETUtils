@@ -6,7 +6,7 @@ namespace LLNETUtils.Configuration.Serialization;
 
 internal class JsonConfigSerializer : IConfigSerializer
 {
-    public ConfigSection Deserialize(string data)
+    public IConfigSection Deserialize(string data)
     {
         JsonElement document = JsonDocument.Parse(data).RootElement;
 
@@ -15,10 +15,10 @@ internal class JsonConfigSerializer : IConfigSerializer
             throw new ArgumentException("JSON must represent an object type.");
         }
 
-        return (ConfigSection) DeserializeJsonElement(document);
+        return (IConfigSection) DeserializeJsonElement(document);
     }
 
-    public string Serialize(ConfigSection section)
+    public string Serialize(IConfigSection section)
     {
         JsonSerializerOptions options = new()
             {WriteIndented = true, Encoder = JavaScriptEncoder.Create(UnicodeRanges.All)};

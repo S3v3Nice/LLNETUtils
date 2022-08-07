@@ -41,7 +41,7 @@ public class Config
 
     public string FilePath { get; set; }
     public Logger? Logger { get; set; }
-    public ConfigSection Root { get; set; }
+    public IConfigSection Root { get; set; }
 
     public ConfigType Type
     {

@@ -8,12 +8,12 @@ namespace LLNETUtils.Configuration.Serialization;
 
 internal class YamlConfigSerializer : IConfigSerializer
 {
-    public ConfigSection Deserialize(string data)
+    public IConfigSection Deserialize(string data)
     {
         IDeserializer deserializer = new DeserializerBuilder()
             .WithNodeTypeResolver(new ConfigNodeTypeResolver())
             .Build();
-        ConfigSection? result = deserializer.Deserialize<ConfigSection?>(data);
+        IConfigSection? result = deserializer.Deserialize<ConfigSection?>(data);
         
         if (result == null)
         {
@@ -23,7 +23,7 @@ internal class YamlConfigSerializer : IConfigSerializer
         return result;
     }
 
-    public string Serialize(ConfigSection section)
+    public string Serialize(IConfigSection section)
     {
         ISerializer serializer = new SerializerBuilder()
             .WithEventEmitter(emitter => new ForceQuoteEventEmitter(emitter))

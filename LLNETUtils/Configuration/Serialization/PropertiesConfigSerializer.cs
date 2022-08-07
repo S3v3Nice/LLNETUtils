@@ -6,7 +6,7 @@ namespace LLNETUtils.Configuration.Serialization;
 
 internal class PropertiesConfigSerializer : IConfigSerializer
 {
-    public ConfigSection Deserialize(string data)
+    public IConfigSection Deserialize(string data)
     {
         ConfigSection section = new();
 
@@ -33,7 +33,7 @@ internal class PropertiesConfigSerializer : IConfigSerializer
         return section;
     }
 
-    public string Serialize(ConfigSection section)
+    public string Serialize(IConfigSection section)
     {
         StringBuilder content = new StringBuilder("# Properties Config file\r\n# ")
             .Append(DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss"))

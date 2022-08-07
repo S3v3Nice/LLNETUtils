@@ -2,7 +2,7 @@
 
 internal interface IConfigSerializer
 {
-    ConfigSection Deserialize(string data);
+    IConfigSection Deserialize(string data);
 
-    string Serialize(ConfigSection section);
+    string Serialize(IConfigSection section);
 }

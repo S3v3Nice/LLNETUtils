@@ -2,7 +2,7 @@
 
 namespace LLNETUtils.Configuration;
 
-public class ConfigSection : LinkedDictionary<string, object>
+public class ConfigSection :  LinkedDictionary<string, object>, IConfigSection
 {
     public object? Get(string key)
     {
@@ -96,7 +96,7 @@ public class ConfigSection : LinkedDictionary<string, object>
         return list == null ? defaultValue : list.Cast<T>().ToList();
     }
 
-    public ConfigSection? GetSection(string key, ConfigSection? defaultValue = null)
+    public IConfigSection? GetSection(string key, IConfigSection? defaultValue = null)
     {
         return Get(key, defaultValue);
     }
