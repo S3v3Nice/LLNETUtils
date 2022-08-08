@@ -4,6 +4,29 @@ namespace LLNETUtils.Configuration;
 
 public class ConfigSection :  LinkedDictionary<string, object>, IConfigSection
 {
+    public ConfigSection()
+    {
+    }
+
+    public ConfigSection(IDictionary<string, object> dictionary)
+    {
+        foreach (var pair in dictionary)
+        {
+            object value = pair.Value;
+            
+            if (value is IDictionary<string, object> dict)
+            {
+                value = new ConfigSection(dict);
+            }
+            else if (value is IEnumerable<object> list)
+            {
+                value = new List<object>(list);
+            }
+            
+            Add(pair.Key, value);
+        }
+    }
+
     public object? Get(string key)
     {
         return Get<object>(key);
