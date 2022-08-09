@@ -44,9 +44,18 @@ public abstract class PluginBase : IPluginInitializer
                 return _config;
             }
 
-            _config = new Config(Path.Join(DataPath, ConfigResourcePath), ConfigType.Yaml, Logger);
+            _config = new Config
+            {
+                FilePath = Path.Join(DataPath, ConfigResourcePath), 
+                Type = ConfigType.Yaml, 
+                Logger = Logger
+            };
 
-            if (!File.Exists(_config.FilePath))
+            if (File.Exists(_config.FilePath))
+            {
+                _config.Reload();
+            }
+            else
             {
                 Stream? configStream = GetResource(ConfigResourcePath);
                 if (configStream != null)
