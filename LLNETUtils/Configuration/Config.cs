@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using LLNET.Logger;
 using LLNETUtils.Configuration.Serialization;
+using LLNETUtils.Utils;
 
 namespace LLNETUtils.Configuration;
 
@@ -69,6 +70,87 @@ public class Config : IConfigSection
                     break;
             }
         }
+    }
+
+    public IEnumerator<KeyValuePair<string, object>> GetEnumerator()
+    {
+        return Root.GetEnumerator();
+    }
+
+    IEnumerator IEnumerable.GetEnumerator()
+    {
+        return GetEnumerator();
+    }
+
+    LinkedDictionary<string, object> IConfigSection.Dictionary
+    {
+        get => Root.Dictionary;
+        set => Root.Dictionary = value;
+    }
+
+    public bool Contains(string key)
+    {
+        return Root.Contains(key);
+    }
+
+    public object? Get(string key)
+    {
+        return Root.Get(key);
+    }
+
+    public T? Get<T>(string key, T? defaultValue = default)
+    {
+        return Root.Get(key, defaultValue);
+    }
+
+    public void Set(string key, object value)
+    {
+        Root.Set(key, value);
+    }
+
+    public string GetString(string key, string defaultValue = "")
+    {
+        return Root.GetString(key, defaultValue);
+    }
+
+    public int GetInt(string key, int defaultValue = default)
+    {
+        return Root.GetInt(key, defaultValue);
+    }
+
+    public double GetFloat(string key, float defaultValue = default)
+    {
+        return Root.GetFloat(key, defaultValue);
+    }
+
+    public double GetDouble(string key, double defaultValue = default)
+    {
+        return Root.GetDouble(key, defaultValue);
+    }
+
+    public bool GetBool(string key, bool defaultValue = default)
+    {
+        return Root.GetBool(key, defaultValue);
+    }
+
+    public DateTime GetDateTime(string key, DateTime defaultValue = default)
+    {
+        return Root.GetDateTime(key, defaultValue);
+    }
+
+    public List<object>? GetList(string key, List<object>? defaultValue = null)
+    {
+        return Root.GetList(key, defaultValue);
+    }
+
+    public List<T>? GetList<T>(string key, List<T>? defaultValue = null)
+    {
+        return Root.GetList(key, defaultValue);
+    }
+
+    public IConfigSection? GetSection(string key, IConfigSection? defaultValue = null)
+    {
+        return Root.GetSection(key, defaultValue);
     }
 
     public bool Reload()
@@ -163,80 +245,5 @@ public class Config : IConfigSection
         string data = _serializer.Serialize(Root);
         File.WriteAllText(filePath, data);
         return true;
-    }
-
-    public IEnumerator<KeyValuePair<string, object>> GetEnumerator()
-    {
-        return Root.GetEnumerator();
-    }
-
-    IEnumerator IEnumerable.GetEnumerator()
-    {
-        return GetEnumerator();
-    }
-
-    public bool ContainsKey(string key)
-    {
-        return Root.ContainsKey(key);
-    }
-
-    public object? Get(string key)
-    {
-        return Root.Get(key);
-    }
-
-    public T? Get<T>(string key, T? defaultValue = default)
-    {
-        return Root.Get(key, defaultValue);
-    }
-
-    public void Set(string key, object value)
-    {
-        Root.Set(key, value);
-    }
-
-    public string GetString(string key, string defaultValue = "")
-    {
-        return Root.GetString(key, defaultValue);
-    }
-
-    public int GetInt(string key, int defaultValue = default)
-    {
-        return Root.GetInt(key, defaultValue);
-    }
-
-    public double GetFloat(string key, float defaultValue = default)
-    {
-        return Root.GetFloat(key, defaultValue);
-    }
-
-    public double GetDouble(string key, double defaultValue = default)
-    {
-        return Root.GetDouble(key, defaultValue);
-    }
-
-    public bool GetBool(string key, bool defaultValue = default)
-    {
-        return Root.GetBool(key, defaultValue);
-    }
-
-    public DateTime GetDateTime(string key, DateTime defaultValue = default)
-    {
-        return Root.GetDateTime(key, defaultValue);
-    }
-
-    public List<object>? GetList(string key, List<object>? defaultValue = null)
-    {
-        return Root.GetList(key, defaultValue);
-    }
-
-    public List<T>? GetList<T>(string key, List<T>? defaultValue = null)
-    {
-        return Root.GetList(key, defaultValue);
-    }
-
-    public IConfigSection? GetSection(string key, IConfigSection? defaultValue = null)
-    {
-        return Root.GetSection(key, defaultValue);
     }
 }

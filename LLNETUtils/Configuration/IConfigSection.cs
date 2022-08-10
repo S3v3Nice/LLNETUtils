@@ -1,8 +1,12 @@
-﻿namespace LLNETUtils.Configuration;
+﻿using LLNETUtils.Utils;
+
+namespace LLNETUtils.Configuration;
 
 public interface IConfigSection : IEnumerable<KeyValuePair<string, object>>
 {
-    bool ContainsKey(string k);
+    internal LinkedDictionary<string, object> Dictionary { get; set; }
+    
+    bool Contains(string key);
     
     object? Get(string key);
 

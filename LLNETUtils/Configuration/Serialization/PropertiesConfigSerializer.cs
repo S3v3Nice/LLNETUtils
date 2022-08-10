@@ -8,7 +8,8 @@ internal class PropertiesConfigSerializer : IConfigSerializer
 {
     public IConfigSection Deserialize(string data)
     {
-        ConfigSection section = new();
+        IConfigSection section = new ConfigSection();
+        var dictionary = section.Dictionary;
 
         foreach (string line in data.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries))
         {
@@ -27,7 +28,7 @@ internal class PropertiesConfigSerializer : IConfigSerializer
             string key = line.Substring(0, splitIndex);
             string value = line.Substring(splitIndex + 1);
 
-            section[key] = ParseValue(value);
+            dictionary[key] = ParseValue(value);
         }
 
         return section;
@@ -52,7 +53,7 @@ internal class PropertiesConfigSerializer : IConfigSerializer
             if (value is double d)
             {
                 NumberFormatInfo nfi = new() {NumberDecimalSeparator = "."};
-                value = ((double) value).ToString(nfi);
+                value = d.ToString(nfi);
             }
 
             content.Append(key).Append('=').Append(value).Append("\r\n");

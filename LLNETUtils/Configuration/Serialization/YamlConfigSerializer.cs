@@ -1,8 +1,10 @@
 ﻿using System.Globalization;
+using LLNETUtils.Utils;
 using YamlDotNet.Core;
 using YamlDotNet.Core.Events;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.EventEmitters;
+using YamlDotNet.Serialization.Utilities;
 
 namespace LLNETUtils.Configuration.Serialization;
 
@@ -10,26 +12,58 @@ internal class YamlConfigSerializer : IConfigSerializer
 {
     public IConfigSection Deserialize(string data)
     {
-        IDeserializer deserializer = new DeserializerBuilder()
-            .WithNodeTypeResolver(new ConfigNodeTypeResolver())
-            .Build();
-        IConfigSection? result = deserializer.Deserialize<ConfigSection?>(data);
-        
+        ConfigSectionConverter converter = new();
+        DeserializerBuilder builder = new DeserializerBuilder()
+            .WithTypeConverter(converter)
+            .WithNodeTypeResolver(new ConfigNodeTypeResolver());
+        converter.ValueDeserializer = builder.BuildValueDeserializer();
+
+        IConfigSection? result = builder.Build().Deserialize<ConfigSection?>(data);
+
         if (result == null)
         {
             throw new ArgumentException("The data provided is not a valid Yaml object!");
         }
-        
+
         return result;
     }
 
     public string Serialize(IConfigSection section)
     {
-        ISerializer serializer = new SerializerBuilder()
-            .WithEventEmitter(emitter => new ForceQuoteEventEmitter(emitter))
-            .Build();
-        
-        return serializer.Serialize(section);
+        ConfigSectionConverter converter = new();
+        SerializerBuilder builder = new SerializerBuilder()
+            .WithTypeConverter(converter)
+            .WithEventEmitter(emitter => new ForceQuoteEventEmitter(emitter));
+        converter.ValueSerializer = builder.BuildValueSerializer();
+
+        return builder.Build().Serialize(section);
+    }
+
+    private class ConfigSectionConverter : IYamlTypeConverter
+    {
+        public IValueSerializer ValueSerializer { get; set; } = null!;
+        public IValueDeserializer ValueDeserializer { get; set; } = null!;
+
+        public bool Accepts(Type type)
+        {
+            return type.IsAssignableTo(typeof(IConfigSection));
+        }
+
+        public object ReadYaml(IParser parser, Type type)
+        {
+            var dict = (LinkedDictionary<string, object>?) ValueDeserializer.DeserializeValue(parser,
+                typeof(LinkedDictionary<string, object>), new SerializerState(), ValueDeserializer);
+            IConfigSection section = new ConfigSection();
+            section.Dictionary = dict!;
+
+            return section;
+        }
+
+        public void WriteYaml(IEmitter emitter, object? value, Type type)
+        {
+            IConfigSection section = (IConfigSection) value!;
+            ValueSerializer.SerializeValue(emitter, section.Dictionary, typeof(IDictionary<string, object>));
+        }
     }
 
     private class ForceQuoteEventEmitter : ChainedEventEmitter

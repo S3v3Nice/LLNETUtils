@@ -1,6 +1,8 @@
 ﻿using System.Text.Encodings.Web;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Text.Unicode;
+using LLNETUtils.Utils;
 
 namespace LLNETUtils.Configuration.Serialization;
 
@@ -8,66 +10,62 @@ internal class JsonConfigSerializer : IConfigSerializer
 {
     public IConfigSection Deserialize(string data)
     {
-        JsonElement document = JsonDocument.Parse(data).RootElement;
-
-        if (document.ValueKind != JsonValueKind.Object)
+        JsonSerializerOptions options = new()
         {
-            throw new ArgumentException("JSON must represent an object type.");
+            Converters = {new ConfigSectionConverterFactory()}
+        };
+        IConfigSection? result = JsonSerializer.Deserialize<ConfigSection>(data, options);
+
+        if (result == null)
+        {
+            throw new ArgumentException("The data provided is not a valid Json object!");
         }
 
-        return (IConfigSection) DeserializeJsonElement(document);
+        return result;
     }
 
     public string Serialize(IConfigSection section)
     {
         JsonSerializerOptions options = new()
-            {WriteIndented = true, Encoder = JavaScriptEncoder.Create(UnicodeRanges.All)};
+        {
+            WriteIndented = true,
+            Encoder = JavaScriptEncoder.Create(UnicodeRanges.All),
+            Converters = {new ConfigSectionConverterFactory()}
+        };
+
         return JsonSerializer.Serialize(section, options);
     }
 
-    private object DeserializeJsonElement(JsonElement jsonElement)
+    private class ConfigSectionConverterFactory : JsonConverterFactory
     {
-        switch (jsonElement.ValueKind)
+        private static readonly JsonConverter Converter = new ConfigSectionConverter();
+
+        public override bool CanConvert(Type typeToConvert)
         {
-            case JsonValueKind.Object:
-                ConfigSection dict = new();
+            return typeToConvert.IsAssignableTo(typeof(IConfigSection));
+        }
 
-                foreach (JsonProperty property in jsonElement.EnumerateObject())
-                {
-                    dict.Add(KeyValuePair.Create(property.Name, DeserializeJsonElement(property.Value)));
-                }
+        public override JsonConverter CreateConverter(Type typeToConvert, JsonSerializerOptions options)
+        {
+            return Converter;
+        }
+    }
 
-                return dict;
+    private class ConfigSectionConverter : JsonConverter<IConfigSection>
+    {
+        public override IConfigSection? Read(ref Utf8JsonReader reader, Type typeToConvert,
+            JsonSerializerOptions options)
+        {
+            var dictionary = JsonSerializer.Deserialize<LinkedDictionary<string, object>>(ref reader, options);
+            IConfigSection section = new ConfigSection();
+            section.Dictionary = dictionary!;
 
-            case JsonValueKind.Array:
-                List<object> list = new();
+            return section;
+        }
 
-                foreach (JsonElement arrayElement in jsonElement.EnumerateArray())
-                {
-                    list.Add(DeserializeJsonElement(arrayElement));
-                }
-
-                return list;
-
-            case JsonValueKind.String:
-                return jsonElement.GetString()!;
-
-            case JsonValueKind.Number:
-                if (jsonElement.TryGetInt32(out int intNum))
-                {
-                    return intNum;
-                }
-
-                return jsonElement.GetDouble();
-
-            case JsonValueKind.True:
-                return true;
-
-            case JsonValueKind.False:
-                return false;
-
-            default:
-                return null!;
+        public override void Write(Utf8JsonWriter writer, IConfigSection value, JsonSerializerOptions options)
+        {
+            JsonSerializer.Serialize(writer, value.Dictionary, options);
         }
     }
 }

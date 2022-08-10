@@ -2,7 +2,7 @@
 
 namespace LLNETUtils.Utils;
 
-public class LinkedDictionary<TKey, TValue> : IDictionary<TKey, TValue>
+internal class LinkedDictionary<TKey, TValue> : IDictionary<TKey, TValue>
     where TKey : notnull
 {
     private readonly Dictionary<TKey, LinkedListNode<KeyValuePair<TKey, TValue>>> _dict = new();

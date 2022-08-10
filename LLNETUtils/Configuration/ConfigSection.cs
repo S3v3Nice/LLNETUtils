@@ -1,9 +1,12 @@
-﻿using LLNETUtils.Utils;
+﻿using System.Collections;
+using LLNETUtils.Utils;
 
 namespace LLNETUtils.Configuration;
 
-public class ConfigSection :  LinkedDictionary<string, object>, IConfigSection
+public class ConfigSection : IConfigSection
 {
+    private LinkedDictionary<string, object> _dictionary = new();
+
     public ConfigSection()
     {
     }
@@ -13,7 +16,7 @@ public class ConfigSection :  LinkedDictionary<string, object>, IConfigSection
         foreach (var pair in dictionary)
         {
             object value = pair.Value;
-            
+
             if (value is IDictionary<string, object> dict)
             {
                 value = new ConfigSection(dict);
@@ -22,9 +25,20 @@ public class ConfigSection :  LinkedDictionary<string, object>, IConfigSection
             {
                 value = MakeConfigList(list);
             }
-            
-            Add(pair.Key, value);
+
+            _dictionary.Add(pair.Key, value);
         }
+    }
+
+    LinkedDictionary<string, object> IConfigSection.Dictionary
+    {
+        get => _dictionary;
+        set => _dictionary = value;
+    }
+
+    public bool Contains(string key)
+    {
+        return _dictionary.ContainsKey(key);
     }
 
     public object? Get(string key)
@@ -34,19 +48,19 @@ public class ConfigSection :  LinkedDictionary<string, object>, IConfigSection
 
     public T? Get<T>(string key, T? defaultValue = default)
     {
-        if (ContainsKey(key))
+        if (_dictionary.ContainsKey(key))
         {
-            return (T) this[key];
+            return (T) _dictionary[key];
         }
 
         string[] keys = key.Split(".", 2);
 
-        if (!ContainsKey(keys[0]))
+        if (!_dictionary.ContainsKey(keys[0]))
         {
             return defaultValue;
         }
 
-        if (this[keys[0]] is ConfigSection section)
+        if (_dictionary[keys[0]] is ConfigSection section)
         {
             return section.Get(keys[1], defaultValue);
         }
@@ -56,31 +70,31 @@ public class ConfigSection :  LinkedDictionary<string, object>, IConfigSection
 
     public void Set(string key, object value)
     {
-        if (ContainsKey(key))
+        if (_dictionary.ContainsKey(key))
         {
-            this[key] = value;
+            _dictionary[key] = value;
             return;
         }
-        
+
         string[] keys = key.Split(".", 2);
         if (keys.Length > 1)
         {
             ConfigSection childSection;
-            if (TryGetValue(keys[0], out object? v) && v is ConfigSection section)
+            if (_dictionary.TryGetValue(keys[0], out object? v) && v is ConfigSection section)
             {
                 childSection = section;
             }
             else
             {
                 childSection = new ConfigSection();
-                Add(keys[0], childSection);
+                _dictionary.Add(keys[0], childSection);
             }
 
             childSection.Set(keys[1], value);
         }
         else
         {
-            this[keys[0]] = value;
+            _dictionary[keys[0]] = value;
         }
     }
 
@@ -130,10 +144,20 @@ public class ConfigSection :  LinkedDictionary<string, object>, IConfigSection
         return Get(key, defaultValue);
     }
 
+    public IEnumerator<KeyValuePair<string, object>> GetEnumerator()
+    {
+        return _dictionary.GetEnumerator();
+    }
+
+    IEnumerator IEnumerable.GetEnumerator()
+    {
+        return GetEnumerator();
+    }
+
     private static List<object> MakeConfigList(IEnumerable<object> source)
     {
         List<object> result = new();
-        
+
         foreach (object item in source)
         {
             if (item is IDictionary<string, object> dict)
