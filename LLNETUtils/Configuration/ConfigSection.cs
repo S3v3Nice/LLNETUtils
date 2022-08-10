@@ -20,7 +20,7 @@ public class ConfigSection :  LinkedDictionary<string, object>, IConfigSection
             }
             else if (value is IEnumerable<object> list)
             {
-                value = new List<object>(list);
+                value = MakeConfigList(list);
             }
             
             Add(pair.Key, value);
@@ -122,5 +122,28 @@ public class ConfigSection :  LinkedDictionary<string, object>, IConfigSection
     public IConfigSection? GetSection(string key, IConfigSection? defaultValue = null)
     {
         return Get(key, defaultValue);
+    }
+
+    private List<object> MakeConfigList(IEnumerable<object> source)
+    {
+        List<object> result = new();
+        
+        foreach (object item in source)
+        {
+            if (item is IDictionary<string, object> dict)
+            {
+                result.Add(new ConfigSection(dict));
+            }
+            else if (item is IEnumerable<object> list)
+            {
+                result.Add(MakeConfigList(list));
+            }
+            else
+            {
+                result.Add(item);
+            }
+        }
+
+        return result;
     }
 }
