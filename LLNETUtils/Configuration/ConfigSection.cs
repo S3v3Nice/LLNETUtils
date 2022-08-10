@@ -56,6 +56,12 @@ public class ConfigSection :  LinkedDictionary<string, object>, IConfigSection
 
     public void Set(string key, object value)
     {
+        if (ContainsKey(key))
+        {
+            this[key] = value;
+            return;
+        }
+        
         string[] keys = key.Split(".", 2);
         if (keys.Length > 1)
         {
@@ -124,7 +130,7 @@ public class ConfigSection :  LinkedDictionary<string, object>, IConfigSection
         return Get(key, defaultValue);
     }
 
-    private List<object> MakeConfigList(IEnumerable<object> source)
+    private static List<object> MakeConfigList(IEnumerable<object> source)
     {
         List<object> result = new();
         
