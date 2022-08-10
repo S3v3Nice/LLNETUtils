@@ -14,14 +14,18 @@ public class LinkedDictionary<TKey, TValue> : IDictionary<TKey, TValue>
 
         set
         {
+            var keyValuePair = KeyValuePair.Create(c, value);
+            
             if (_dict.ContainsKey(c))
             {
-                _list.Remove(_dict[c]);
+                _dict[c].Value = keyValuePair;
             }
-
-            var node = new LinkedListNode<KeyValuePair<TKey, TValue>>(KeyValuePair.Create(c, value));
-            _dict[c] = node;
-            _list.AddLast(node);
+            else
+            {
+                var node = new LinkedListNode<KeyValuePair<TKey, TValue>>(keyValuePair);
+                _dict[c] = node;
+                _list.AddLast(node);
+            }
         }
     }
 
