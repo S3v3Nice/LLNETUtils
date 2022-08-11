@@ -37,7 +37,7 @@ internal class PropertiesConfigSerializer : IConfigSerializer
     public string Serialize(IConfigSection section)
     {
         StringBuilder content = new StringBuilder("# Properties Config file\r\n# ")
-            .Append(DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss"))
+            .Append(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"))
             .Append("\r\n");
 
         foreach (var entry in section)
