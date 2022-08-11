@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System.Diagnostics.CodeAnalysis;
 using LLNETUtils.Utils;
 
 namespace LLNETUtils.Configuration;
@@ -36,66 +37,63 @@ public class ConfigSection : IConfigSection
         set => _dictionary = value;
     }
 
+    public void Clear()
+    {
+        _dictionary.Clear();
+    }
+
     public bool Contains(string key)
     {
-        return _dictionary.ContainsKey(key);
+        return ((IConfigSection) this).Find(key, out _, out _);
     }
 
-    public object? Get(string key)
+    public void Remove(string key)
     {
-        return Get<object>(key);
-    }
-
-    public T? Get<T>(string key, T? defaultValue = default)
-    {
-        if (_dictionary.ContainsKey(key))
+        if (((IConfigSection) this).Find(key, out var lastDict, out string lastKey))
         {
-            return (T) _dictionary[key];
+            lastDict.Remove(lastKey);
         }
-
-        string[] keys = key.Split(".", 2);
-
-        if (!_dictionary.ContainsKey(keys[0]))
-        {
-            return defaultValue;
-        }
-
-        if (_dictionary[keys[0]] is ConfigSection section)
-        {
-            return section.Get(keys[1], defaultValue);
-        }
-
-        return defaultValue;
     }
 
     public void Set(string key, object value)
     {
-        if (_dictionary.ContainsKey(key))
+        if (((IConfigSection) this).Find(key, out var lastDict, out string lastKey))
         {
-            _dictionary[key] = value;
+            lastDict[lastKey] = value;
             return;
         }
 
-        string[] keys = key.Split(".", 2);
-        if (keys.Length > 1)
+        string[] keys = lastKey.Split('.');
+        for (int i = 0; i < keys.Length - 1; i++)
         {
-            ConfigSection childSection;
-            if (_dictionary.TryGetValue(keys[0], out object? v) && v is ConfigSection section)
-            {
-                childSection = section;
-            }
-            else
-            {
-                childSection = new ConfigSection();
-                _dictionary.Add(keys[0], childSection);
-            }
+            IConfigSection newSection = new ConfigSection();
+            lastDict[keys[i]] = newSection;
+            lastDict = newSection.Dictionary;
+        }
 
-            childSection.Set(keys[1], value);
-        }
-        else
+        lastDict[keys[^1]] = value;
+    }
+
+    public bool TryGet<T>(string key, [MaybeNullWhen(false)] out T value)
+    {
+        if (((IConfigSection) this).Find(key, out var lastDict, out string lastKey) && lastDict[lastKey] is T v)
         {
-            _dictionary[keys[0]] = value;
+            value = v;
+            return true;
         }
+
+        value = default;
+        return false;
+    }
+
+    public T? Get<T>(string key, T? defaultValue = default)
+    {
+        return TryGet(key, out T? result) ? result : defaultValue;
+    }
+    
+    public object? Get(string key)
+    {
+        return Get<object>(key);
     }
 
     public string GetString(string key, string defaultValue = "")
@@ -152,6 +150,32 @@ public class ConfigSection : IConfigSection
     IEnumerator IEnumerable.GetEnumerator()
     {
         return GetEnumerator();
+    }
+
+    bool IConfigSection.Find(string key, out IDictionary<string, object> lastDict, out string lastKey)
+    {
+        lastDict = _dictionary;
+        lastKey = key;
+        
+        if (_dictionary.TryGetValue(key, out _))
+        {
+            return true;
+        }
+
+        int index = 0;
+        while ((index = key.IndexOf('.', index + 1)) != -1)
+        {
+            string key1 = key[..index];
+            string key2 = key[(index + 1)..];
+
+            if (_dictionary.TryGetValue(key1, out object? value) && value is IConfigSection section 
+                                                                 && section.Find(key2, out lastDict, out lastKey))
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private static List<object> MakeConfigList(IEnumerable<object> source)

@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System.Diagnostics.CodeAnalysis;
 using LLNET.Logger;
 using LLNETUtils.Configuration.Serialization;
 using LLNETUtils.Utils;
@@ -88,9 +89,29 @@ public class Config : IConfigSection
         set => Root.Dictionary = value;
     }
 
+    public void Clear()
+    {
+        Root.Clear();
+    }
+
     public bool Contains(string key)
     {
         return Root.Contains(key);
+    }
+
+    public void Remove(string key)
+    {
+        Root.Remove(key);
+    }
+
+    public void Set(string key, object value)
+    {
+        Root.Set(key, value);
+    }
+
+    public bool TryGet<T>(string key, [MaybeNullWhen(false)] out T value)
+    {
+        return Root.TryGet(key, out value);
     }
 
     public object? Get(string key)
@@ -101,11 +122,6 @@ public class Config : IConfigSection
     public T? Get<T>(string key, T? defaultValue = default)
     {
         return Root.Get(key, defaultValue);
-    }
-
-    public void Set(string key, object value)
-    {
-        Root.Set(key, value);
     }
 
     public string GetString(string key, string defaultValue = "")
@@ -151,6 +167,11 @@ public class Config : IConfigSection
     public IConfigSection? GetSection(string key, IConfigSection? defaultValue = null)
     {
         return Root.GetSection(key, defaultValue);
+    }
+
+    bool IConfigSection.Find(string key, out IDictionary<string, object> dict, out string dictKey)
+    {
+        return Root.Find(key, out dict, out dictKey);
     }
 
     public bool Reload()

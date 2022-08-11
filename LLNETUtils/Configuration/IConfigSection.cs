@@ -1,18 +1,25 @@
-﻿using LLNETUtils.Utils;
+﻿using System.Diagnostics.CodeAnalysis;
+using LLNETUtils.Utils;
 
 namespace LLNETUtils.Configuration;
 
 public interface IConfigSection : IEnumerable<KeyValuePair<string, object>>
 {
     internal LinkedDictionary<string, object> Dictionary { get; set; }
+
+    void Clear();
     
     bool Contains(string key);
+
+    void Remove(string key);
     
-    object? Get(string key);
+    void Set(string key, object value);
+
+    bool TryGet<T>(string key, [MaybeNullWhen(false)] out T value);
 
     T? Get<T>(string key, T? defaultValue = default);
-
-    void Set(string key, object value);
+    
+    object? Get(string key);
 
     string GetString(string key, string defaultValue = "");
 
@@ -31,4 +38,6 @@ public interface IConfigSection : IEnumerable<KeyValuePair<string, object>>
     List<T>? GetList<T>(string key, List<T>? defaultValue = null);
 
     IConfigSection? GetSection(string key, IConfigSection? defaultValue = null);
+
+    internal bool Find(string key, out IDictionary<string, object> lastDict, out string lastKey);
 }
