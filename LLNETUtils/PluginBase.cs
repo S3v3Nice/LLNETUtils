@@ -66,6 +66,7 @@ public abstract class PluginBase : IPluginInitializer
 
             return _config;
         }
+        set => _config = value;
     }
 
     public abstract string Introduction { get; }
