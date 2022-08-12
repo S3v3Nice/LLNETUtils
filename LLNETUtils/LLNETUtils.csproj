@@ -9,6 +9,10 @@
         <Company>S3v3Nice</Company>
     </PropertyGroup>
 
+    <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+      <DocumentationFile>bin\Release\LLNETUtils.xml</DocumentationFile>
+    </PropertyGroup>
+
     <ItemGroup>
         <Reference Include="LiteLoader.NET">
             <HintPath>..\..\LiteLoader.NET.dll</HintPath>
