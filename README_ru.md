@@ -1,20 +1,24 @@
 ﻿# LLNETUtils
 
-##### [English](README.md) | Русский
+###### [English](README.md) | Русский
 
-Библиотека для [LiteLoader.NET](https://github.com/LiteLDev/LiteLoader.NET) для более удобной разработки плагинов. Предоставляется следующий функционал:
+Библиотека для [LiteLoader.NET](https://github.com/LiteLDev/LiteLoader.NET) для более удобной разработки плагинов. `LLNETUtils` предоставляет следующие возможности:
 - Сохранение ресурсов в папку с данными вашего плагина
 - Чтение и редактирование `YAML`, `JSON` и `Properties` конфигов
 
+## Установка
+
+1. Скачайте последний файл `LLNETUtils.dll` из [Releases](https://github.com/S3v3Nice/LLNETUtils/releases)
+2. Скопируйте `LLNETUtils.dll` в `plugins/lib` в директории сервера.
+
 ## Начало работы
 
-1. Скачайте последний файл <code>LLNETUtils-<i>версия</i>.zip</code> из [Releases](https://github.com/S3v3Nice/LLNETUtils/releases)
-2. Распакуйте содержимое архива в `plugins/lib` в директории сервера
-3. Добавьте в своем проекте ссылку на `LLNETUtils.dll`
-4. Сделайте так, чтобы ваш основной класс плагина наследовал класс `PluginBase`:
+1. **[Необязательно]** Скопируйте документационный файл `LLNETUtils.xml` (из [Releases](https://github.com/S3v3Nice/LLNETUtils/releases)) в папку с `LLNETUtils.dll`
+2. Добавьте в своем проекте ссылку на `LLNETUtils.dll`
+3. Сделайте так, чтобы ваш основной класс плагина наследовал класс `PluginBase`:
 
 ```csharp
-[PluginMain("Имя")]
+[PluginMain("Название плагина")]
 public class Main : PluginBase
 {
     ...
@@ -23,7 +27,7 @@ public class Main : PluginBase
 
 ## Ресурсы плагина
 
-> Ваши файлы ресурсов должны быть обозначены в проекте как `EmbeddedResource`.
+> Ваши файлы ресурсов должны быть обозначены в проекте как вложенные ресурсы (`EmbeddedResource`).
 
 ### Сохранение ресурса
 
@@ -52,6 +56,7 @@ SaveDefaultConfig(true)
 ### Получить поток файла ресурсов
 
 Используйте метод `GetResource` класса `PluginBase`. Это позволит вам читать файл ресурсов (используя его поток), не сохраняя его в папку с данными плагина.
+
 ```csharp
 Stream? resource = GetResource("lang.json");
 ```
@@ -62,7 +67,7 @@ Stream? resource = GetResource("lang.json");
 
 ### Загрузка конфига
 
-Вы можете загружать конфиг из файла или из потока, используя метод `Load` класса `Config`.
+Вы можете загружать конфиг из файла или из потока, используя методы `Load` и `Reload` класса `Config`, либо сразу при инициализации.
 
 ```csharp
 var config = new Config();
@@ -71,9 +76,20 @@ var config = new Config();
 config.Load(Path.Join(DataPath, "ru_RU.json"));
 // Загрузить из потока
 config.Load(GetResource("ru_RU.json")!, ConfigType.Json);
+// Перезагрузить из файла
+config.Reload();
+
+// Создать объект и сразу загрузить из файла
+var config2 = new Config(Path.Join(DataPath, "ru_RU.json"));
 ```
 
-> Если вы работаете с `config.yml`, вы можете не создавать объект `Config` и потом загружать его, просто используйте свойство `Config` класса `PluginBase`.
+Если вы работаете с `config.yml`, вы можете не создавать вручную новый объект `Config` и загружать его. 
+Просто используйте свойство `Config` класса `PluginBase`. 
+Конфиг загрузится автоматически, если имеется соответствующий файл или вложенный ресурс.
+
+```csharp
+Config defaultConfig = Config;
+```
 
 ### Сохранение конфига
 
@@ -86,21 +102,23 @@ config.Save(Path.Join(DataPath, "lang/ru_RU.json"));
 
 ### Чтение и редактирование конфига
 
-Используйте свойство `Root` класса `Config`, чтобы получить корневой раздел (объект `ConfigSection`), который позволит вам читать и редактировать конфиг.
+Все нужные методы хранятся в интерфейсе `IConfigSection` (классы `Config` и `ConfigSection` реализуют данный интерфейс).
+
+Пример работы с конфигом:
 
 ```csharp
-ConfigSection root = config.Root;
+Config config = new Config(Path.Join(DataPath, "user1.yml"));
 
-// Чтение конфига
-object? unknown         = root.Get("unknown");
-string? name            = root.Get<string>("name");
-int age                 = root.GetInt("age");
-DateTime birthDate      = root.GetDateTime("birthDate");
-List<string>? languages = root.GetList<string>("languages");
-ConfigSection settings  = root.GetSection("settings");
+string? name            = config.Get<string>("name");
+string lastName         = config.GetString("last-name", "Unknown");
+int id                  = config.GetInt("id");
+List<string>? perms     = config.GetList<string>("perms");
+IConfigSection settings = config.GetSection("settings")!;
+DateTime birthDate      = settings.GetDateTime("birth-date");
 
-// Редактирование конфига
-root.Set("name", "Pavel");
-root.Set("hobby", new [] {"Coding", "Reading", "Playing"});
-root.Set("isAdmin", true);
+config.Set("name", "Pavel");
+config.Set("extra-data", new ConfigSection());
+config.Remove("perms");
+settings.Clear();
+config.Set("settings.mute-notifications", true);
 ```
