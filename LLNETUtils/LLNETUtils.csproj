@@ -5,6 +5,8 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+        <AssemblyVersion>1.1.0</AssemblyVersion>
+        <Company>S3v3Nice</Company>
     </PropertyGroup>
 
     <ItemGroup>
