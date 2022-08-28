@@ -88,11 +88,13 @@ public class Config : IConfigSection
         }
     }
     
-    ConfigDictionary IConfigSection.Dictionary
+    IDictionary<string, object> IConfigSection.Dictionary
     {
         get => Root.Dictionary;
         set => Root.Dictionary = value;
     }
+    
+    public IDictionary<string, object> Dictionary => Root.Dictionary;
 
     /**
      * <summary>Reloads the config from a file (by FilePath).</summary>

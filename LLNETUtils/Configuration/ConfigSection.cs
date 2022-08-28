@@ -21,11 +21,13 @@ public class ConfigSection : IConfigSection
         _dictionary = dictionary as ConfigDictionary ?? new ConfigDictionary(dictionary);
     }
 
-    ConfigDictionary IConfigSection.Dictionary
+    IDictionary<string, object> IConfigSection.Dictionary
     {
         get => _dictionary;
-        set => _dictionary = value;
+        set => _dictionary = value as ConfigDictionary ?? new ConfigDictionary(value);
     }
+
+    public IDictionary<string, object> Dictionary => _dictionary;
 
     public void Clear()
     {
