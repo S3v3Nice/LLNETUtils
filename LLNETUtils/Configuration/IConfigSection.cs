@@ -1,11 +1,10 @@
 ﻿using System.Diagnostics.CodeAnalysis;
-using LLNETUtils.Utils;
 
 namespace LLNETUtils.Configuration;
 
 public interface IConfigSection : IEnumerable<KeyValuePair<string, object>>
 {
-    internal LinkedDictionary<string, object> Dictionary { get; set; }
+    internal ConfigDictionary Dictionary { get; set; }
 
     void Clear();
     
@@ -33,9 +32,9 @@ public interface IConfigSection : IEnumerable<KeyValuePair<string, object>>
 
     DateTime GetDateTime(string key, DateTime defaultValue = default);
 
-    List<object>? GetList(string key, List<object>? defaultValue = null);
+    IList<object>? GetList(string key, IList<object>? defaultValue = null);
 
-    List<T>? GetList<T>(string key, List<T>? defaultValue = null);
+    IList<T>? GetList<T>(string key, IList<T>? defaultValue = null);
 
     IConfigSection? GetSection(string key, IConfigSection? defaultValue = null);
 

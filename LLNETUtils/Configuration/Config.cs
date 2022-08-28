@@ -2,7 +2,6 @@
 using System.Diagnostics.CodeAnalysis;
 using LLNET.Logger;
 using LLNETUtils.Configuration.Serialization;
-using LLNETUtils.Utils;
 
 namespace LLNETUtils.Configuration;
 
@@ -83,7 +82,7 @@ public class Config : IConfigSection
         return GetEnumerator();
     }
 
-    LinkedDictionary<string, object> IConfigSection.Dictionary
+    ConfigDictionary IConfigSection.Dictionary
     {
         get => Root.Dictionary;
         set => Root.Dictionary = value;
@@ -154,12 +153,12 @@ public class Config : IConfigSection
         return Root.GetDateTime(key, defaultValue);
     }
 
-    public List<object>? GetList(string key, List<object>? defaultValue = null)
+    public IList<object>? GetList(string key, IList<object>? defaultValue = null)
     {
         return Root.GetList(key, defaultValue);
     }
 
-    public List<T>? GetList<T>(string key, List<T>? defaultValue = null)
+    public IList<T>? GetList<T>(string key, IList<T>? defaultValue = null)
     {
         return Root.GetList(key, defaultValue);
     }

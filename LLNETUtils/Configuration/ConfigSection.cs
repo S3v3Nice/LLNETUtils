@@ -1,37 +1,23 @@
 ﻿using System.Collections;
 using System.Diagnostics.CodeAnalysis;
-using LLNETUtils.Utils;
 
 namespace LLNETUtils.Configuration;
 
 public class ConfigSection : IConfigSection
 {
-    private LinkedDictionary<string, object> _dictionary = new();
+    private ConfigDictionary _dictionary;
 
     public ConfigSection()
     {
+        _dictionary = new ConfigDictionary();
     }
 
     public ConfigSection(IDictionary<string, object> dictionary)
     {
-        foreach (var pair in dictionary)
-        {
-            object value = pair.Value;
-
-            if (value is IDictionary<string, object> dict)
-            {
-                value = new ConfigSection(dict);
-            }
-            else if (value is IEnumerable<object> list)
-            {
-                value = MakeConfigList(list);
-            }
-
-            _dictionary.Add(pair.Key, value);
-        }
+        _dictionary = dictionary as ConfigDictionary ?? new ConfigDictionary(dictionary);
     }
 
-    LinkedDictionary<string, object> IConfigSection.Dictionary
+    ConfigDictionary IConfigSection.Dictionary
     {
         get => _dictionary;
         set => _dictionary = value;
@@ -126,12 +112,12 @@ public class ConfigSection : IConfigSection
         return Get(key, defaultValue);
     }
 
-    public List<object>? GetList(string key, List<object>? defaultValue = null)
+    public IList<object>? GetList(string key, IList<object>? defaultValue = null)
     {
         return Get(key, defaultValue);
     }
 
-    public List<T>? GetList<T>(string key, List<T>? defaultValue = null)
+    public IList<T>? GetList<T>(string key, IList<T>? defaultValue = null)
     {
         var list = GetList(key);
         return list == null ? defaultValue : list.Cast<T>().ToList();
@@ -176,28 +162,5 @@ public class ConfigSection : IConfigSection
         }
 
         return false;
-    }
-
-    private static List<object> MakeConfigList(IEnumerable<object> source)
-    {
-        List<object> result = new();
-
-        foreach (object item in source)
-        {
-            if (item is IDictionary<string, object> dict)
-            {
-                result.Add(new ConfigSection(dict));
-            }
-            else if (item is IEnumerable<object> list)
-            {
-                result.Add(MakeConfigList(list));
-            }
-            else
-            {
-                result.Add(item);
-            }
-        }
-
-        return result;
     }
 }

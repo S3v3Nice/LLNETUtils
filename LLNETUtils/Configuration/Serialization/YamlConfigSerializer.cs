@@ -12,58 +12,24 @@ internal class YamlConfigSerializer : IConfigSerializer
 {
     public IConfigSection Deserialize(string data)
     {
-        ConfigSectionConverter converter = new();
         DeserializerBuilder builder = new DeserializerBuilder()
-            .WithTypeConverter(converter)
             .WithNodeTypeResolver(new ConfigNodeTypeResolver());
-        converter.ValueDeserializer = builder.BuildValueDeserializer();
-
-        IConfigSection? result = builder.Build().Deserialize<ConfigSection?>(data);
+        ConfigDictionary? result = builder.Build().Deserialize<ConfigDictionary?>(data);
 
         if (result == null)
         {
             throw new ArgumentException("The data provided is not a valid Yaml object!");
         }
 
-        return result;
+        return new ConfigSection(result);
     }
 
     public string Serialize(IConfigSection section)
     {
-        ConfigSectionConverter converter = new();
         SerializerBuilder builder = new SerializerBuilder()
-            .WithTypeConverter(converter)
             .WithEventEmitter(emitter => new ForceQuoteEventEmitter(emitter));
-        converter.ValueSerializer = builder.BuildValueSerializer();
 
-        return builder.Build().Serialize(section);
-    }
-
-    private class ConfigSectionConverter : IYamlTypeConverter
-    {
-        public IValueSerializer ValueSerializer { get; set; } = null!;
-        public IValueDeserializer ValueDeserializer { get; set; } = null!;
-
-        public bool Accepts(Type type)
-        {
-            return type.IsAssignableTo(typeof(IConfigSection));
-        }
-
-        public object ReadYaml(IParser parser, Type type)
-        {
-            var dict = (LinkedDictionary<string, object>?) ValueDeserializer.DeserializeValue(parser,
-                typeof(LinkedDictionary<string, object>), new SerializerState(), ValueDeserializer);
-            IConfigSection section = new ConfigSection();
-            section.Dictionary = dict!;
-
-            return section;
-        }
-
-        public void WriteYaml(IEmitter emitter, object? value, Type type)
-        {
-            IConfigSection section = (IConfigSection) value!;
-            ValueSerializer.SerializeValue(emitter, section.Dictionary, typeof(IDictionary<string, object>));
-        }
+        return builder.Build().Serialize(section.Dictionary);
     }
 
     private class ForceQuoteEventEmitter : ChainedEventEmitter
@@ -94,7 +60,7 @@ internal class YamlConfigSerializer : IConfigSerializer
 
             if (nodeEvent is MappingStart)
             {
-                currentType = typeof(ConfigSection);
+                currentType = typeof(ConfigDictionary);
                 return true;
             }
 
