@@ -3,6 +3,7 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace LLNETUtils.Configuration;
 
+/// <summary>Class for reading and editing the config section</summary>
 public class ConfigSection : IConfigSection
 {
     private ConfigDictionary _dictionary;
@@ -12,6 +13,9 @@ public class ConfigSection : IConfigSection
         _dictionary = new ConfigDictionary();
     }
 
+    /**
+     * <param name="dictionary">The dictionary to take as the base for the config section.</param>
+     */
     public ConfigSection(IDictionary<string, object> dictionary)
     {
         _dictionary = dictionary as ConfigDictionary ?? new ConfigDictionary(dictionary);
@@ -92,7 +96,7 @@ public class ConfigSection : IConfigSection
         return Get(key) is IConvertible value ? value.ToInt32(null) : defaultValue;
     }
 
-    public double GetFloat(string key, float defaultValue = default)
+    public float GetFloat(string key, float defaultValue = default)
     {
         return Get(key) is IConvertible value ? value.ToSingle(null) : defaultValue;
     }

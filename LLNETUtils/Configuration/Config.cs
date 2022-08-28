@@ -5,14 +5,21 @@ using LLNETUtils.Configuration.Serialization;
 
 namespace LLNETUtils.Configuration;
 
+/// <summary>Configuration format type.</summary>
 public enum ConfigType
 {
+    /// <summary>Undefined format type. The format type will be automatically
+    /// determined by the file extension, or defined as Yaml.</summary>
     Undefined,
+    /// <summary>YAML format type.</summary>
     Yaml,
+    /// <summary>JSON format type.</summary>
     Json,
+    /// <summary>Properties format type.</summary>
     Properties
 }
 
+/// <summary>Class for working with the config.</summary>
 public class Config : IConfigSection
 {
     private static readonly Dictionary<string, ConfigType> FormatTypes = new()
@@ -27,6 +34,11 @@ public class Config : IConfigSection
     private IConfigSerializer _serializer;
     private ConfigType _type;
 
+    /**
+     * <param name="filePath">Full path to the config file.</param>
+     * <param name="type">Configuration format type.</param>
+     * <param name="logger">Logger for displaying occurring errors in the console.</param>
+     */
     public Config(string filePath = "", ConfigType type = ConfigType.Undefined, Logger? logger = null)
     {
         _serializer = null!;
@@ -41,10 +53,14 @@ public class Config : IConfigSection
         }
     }
 
+    /// <summary>Full path to the config file.</summary>
     public string FilePath { get; set; }
+    /// <summary>Logger for displaying occurring errors in the console.</summary>
     public Logger? Logger { get; set; }
+    /// <summary>Root config section.</summary>
     public IConfigSection Root { get; set; }
 
+    /// <summary>Configuration format type.</summary>
     public ConfigType Type
     {
         get => _type;
@@ -71,6 +87,127 @@ public class Config : IConfigSection
             }
         }
     }
+    
+    ConfigDictionary IConfigSection.Dictionary
+    {
+        get => Root.Dictionary;
+        set => Root.Dictionary = value;
+    }
+
+    /**
+     * <summary>Reloads the config from a file (by FilePath).</summary>
+     * <returns>true if the config was reloaded successfully; otherwise, false.</returns>
+     */
+    public bool Reload()
+    {
+        return Load(FilePath, Type);
+    }
+
+    /**
+     * <summary>Loads the config from a file.</summary>
+     * <param name="filePath">Full path to the file to load the config from.</param>
+     * <param name="type">Configuration format type.</param>
+     * <returns>true if the config was loaded successfully; otherwise, false.</returns>
+     */
+    public bool Load(string filePath, ConfigType type = ConfigType.Undefined)
+    {
+        if (!File.Exists(filePath))
+        {
+            Logger?.Error.WriteLine($"Could not load {Type} config from a file '{filePath}':\nNo such file!");
+            return false;
+        }
+
+        if (type != ConfigType.Undefined)
+        {
+            Type = type;
+        }
+        else if (Type == ConfigType.Undefined)
+        {
+            Type = FormatTypes.GetValueOrDefault(Path.GetExtension(filePath), ConfigType.Yaml);
+        }
+
+        try
+        {
+            string data = File.ReadAllText(filePath);
+            Root = _serializer.Deserialize(data);
+        }
+        catch (Exception e)
+        {
+            Logger?.Error.WriteLine($"Could not load {Type} config from a file '{filePath}':\n{e}");
+            return false;
+        }
+
+        FilePath = filePath;
+        return true;
+    }
+
+    /**
+     * <summary>Loads the config from a stream.</summary>
+     * <param name="stream">Stream to load the config from.</param>
+     * <param name="type">Configuration format type.</param>
+     * <returns>true if the config was loaded successfully; otherwise, false.</returns>
+     */
+    public bool Load(Stream stream, ConfigType type = ConfigType.Undefined)
+    {
+        if (type != ConfigType.Undefined)
+        {
+            Type = type;
+        }
+        else if (Type == ConfigType.Undefined)
+        {
+            Type = ConfigType.Yaml;
+        }
+
+        try
+        {
+            using StreamReader streamReader = new(stream);
+            string data = streamReader.ReadToEnd();
+            Root = _serializer.Deserialize(data);
+        }
+        catch (Exception e)
+        {
+            Logger?.Error.WriteLine($"Could not load {Type} config from a stream:\n{e}");
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * <summary>Saves the config to the specified path.</summary>
+     * <param name="filePath">Full path to save the config.</param>
+     * <returns>true if the config was saved successfully; otherwise, false.</returns>
+     */
+    public bool Save(string filePath = "")
+    {
+        if (filePath == "")
+        {
+            filePath = FilePath;
+        }
+
+        if (!File.Exists(filePath))
+        {
+            try
+            {
+                FileInfo file = new(filePath);
+                DirectoryInfo? dir = file.Directory;
+
+                if (dir != null && !dir.Exists)
+                {
+                    dir.Create();
+                }
+            }
+            catch (Exception e)
+            {
+                Logger?.Error.WriteLine($"Could not save {Type} config to '{filePath}':\n{e}");
+                return false;
+            }
+        }
+
+        string data = _serializer.Serialize(Root);
+        File.WriteAllText(filePath, data);
+        return true;
+    }
 
     public IEnumerator<KeyValuePair<string, object>> GetEnumerator()
     {
@@ -80,12 +217,6 @@ public class Config : IConfigSection
     IEnumerator IEnumerable.GetEnumerator()
     {
         return GetEnumerator();
-    }
-
-    ConfigDictionary IConfigSection.Dictionary
-    {
-        get => Root.Dictionary;
-        set => Root.Dictionary = value;
     }
 
     public void Clear()
@@ -133,7 +264,7 @@ public class Config : IConfigSection
         return Root.GetInt(key, defaultValue);
     }
 
-    public double GetFloat(string key, float defaultValue = default)
+    public float GetFloat(string key, float defaultValue = default)
     {
         return Root.GetFloat(key, defaultValue);
     }
@@ -171,99 +302,5 @@ public class Config : IConfigSection
     bool IConfigSection.Find(string key, out IDictionary<string, object> dict, out string dictKey)
     {
         return Root.Find(key, out dict, out dictKey);
-    }
-
-    public bool Reload()
-    {
-        return Load(FilePath, Type);
-    }
-
-    public bool Load(string filePath, ConfigType type = ConfigType.Undefined)
-    {
-        if (!File.Exists(filePath))
-        {
-            Logger?.Error.WriteLine($"Could not load {Type} config from a file '{filePath}':\nNo such file!");
-            return false;
-        }
-
-        if (type != ConfigType.Undefined)
-        {
-            Type = type;
-        }
-        else if (Type == ConfigType.Undefined)
-        {
-            Type = FormatTypes.GetValueOrDefault(Path.GetExtension(filePath), ConfigType.Yaml);
-        }
-
-        try
-        {
-            string data = File.ReadAllText(filePath);
-            Root = _serializer.Deserialize(data);
-        }
-        catch (Exception e)
-        {
-            Logger?.Error.WriteLine($"Could not load {Type} config from a file '{filePath}':\n{e}");
-            return false;
-        }
-
-        FilePath = filePath;
-        return true;
-    }
-
-    public bool Load(Stream stream, ConfigType type = ConfigType.Undefined)
-    {
-        if (type != ConfigType.Undefined)
-        {
-            Type = type;
-        }
-        else if (Type == ConfigType.Undefined)
-        {
-            Type = ConfigType.Yaml;
-        }
-
-        try
-        {
-            using StreamReader streamReader = new(stream);
-            string data = streamReader.ReadToEnd();
-            Root = _serializer.Deserialize(data);
-        }
-        catch (Exception e)
-        {
-            Logger?.Error.WriteLine($"Could not load {Type} config from a stream:\n{e}");
-            return false;
-        }
-
-        return true;
-    }
-
-    public bool Save(string filePath = "")
-    {
-        if (filePath == "")
-        {
-            filePath = FilePath;
-        }
-
-        if (!File.Exists(filePath))
-        {
-            try
-            {
-                FileInfo file = new(filePath);
-                DirectoryInfo? dir = file.Directory;
-
-                if (dir != null && !dir.Exists)
-                {
-                    dir.Create();
-                }
-            }
-            catch (Exception e)
-            {
-                Logger?.Error.WriteLine($"Could not save {Type} config to '{filePath}':\n{e}");
-                return false;
-            }
-        }
-
-        string data = _serializer.Serialize(Root);
-        File.WriteAllText(filePath, data);
-        return true;
     }
 }

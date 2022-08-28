@@ -7,6 +7,7 @@ using LLNETUtils.Configuration;
 
 namespace LLNETUtils;
 
+/// <summary>Class that is the base for the main plugin class.</summary>
 public abstract class PluginBase : IPluginInitializer
 {
     private const string ConfigResourcePath = "config.yml";
@@ -30,11 +31,16 @@ public abstract class PluginBase : IPluginInitializer
         DataPath = Path.Join(ServerPath, "plugins", Name);
     }
 
+    /// <summary>Full path to the main server directory.</summary>
     public static string ServerPath { get; }
+    /// <summary>Full path to the plugin data directory.</summary>
     public string DataPath { get; }
+    /// <summary>Name of the plugin specified in the PluginMain attribute.</summary>
     public string Name { get; }
+    /// <summary>Logger of the plugin.</summary>
     public Logger Logger { get; }
 
+    /// <summary>The main config of the plugin. The default is config.yml.</summary>
     public Config Config
     {
         get
@@ -69,16 +75,20 @@ public abstract class PluginBase : IPluginInitializer
         set => _config = value;
     }
 
+    /// <summary>A brief description of the plugin.</summary>
     public abstract string Introduction { get; }
+    /// <summary>Version of the plugin.</summary>
     public abstract Version Version { get; }
+    /// <summary>Metadata, which may include author name, website, etc.</summary>
     public abstract Dictionary<string, string> MetaData { get; }
 
+    /// <summary>Method that is called after loading this plugin.</summary>
     public abstract void OnInitialize();
 
     /**
-     * <summary>Get EmbeddedResource by file path</summary>
-     * <param name="resourcePath">Approximate path to the embedded resource file (e.g. "lang/en.yml" or "en.yml")</param>
-     * <returns>Stream - if a resource with a given path exists, null - if a resource doesn't exist</returns>
+     * <summary>Returns EmbeddedResource by file path.</summary>
+     * <param name="resourcePath">Approximate path to the embedded resource file (e.g. "lang/en.yml" or "en.yml").</param>
+     * <returns>Stream if a resource with a given path exists; otherwise, null.</returns>
      */
     public Stream? GetResource(string resourcePath)
     {
@@ -92,11 +102,11 @@ public abstract class PluginBase : IPluginInitializer
     }
 
     /**
-     * <summary>Save EmbeddedResource by file path</summary>
-     * <param name="resourcePath">Approximate path to the embedded resource file (e.g. "lang/ru.yml" or "ru.yml")</param>
-     * <param name="replace">Is it necessary to replace the file if it already exists</param>
-     * <param name="outputPath">Path of the output file in plugin data directory</param>
-     * <returns>true if the resource has been saved, false - if has not</returns>
+     * <summary>Saves EmbeddedResource by file path.</summary>
+     * <param name="resourcePath">Approximate path to the embedded resource file (e.g. "lang/en.yml" or "en.yml").</param>
+     * <param name="replace">Whether a file needs to be replaced if it already exists.</param>
+     * <param name="outputPath">Path of the output file in plugin data directory.</param>
+     * <returns>true if the resource has been saved; otherwise, false.</returns>
      */
     public bool SaveResource(string resourcePath, bool replace = false, string outputPath = "")
     {
@@ -142,31 +152,21 @@ public abstract class PluginBase : IPluginInitializer
         }
     }
 
-    /**
-     * <summary>Load config resource file (config.yml) from plugin data folder</summary>
-     */
+    /// <summary>Reloads the Config stored in the Config property.</summary>
     public void ReloadConfig()
     {
         Config.Reload();
     }
 
-    /**
-     * <summary>
-     *     Save config to plugin data folder. This includes changes that have been made
-     *     to the config at runtime (using the Config class)
-     * </summary>
-     */
+    /// <summary>Saves the Config stored in the Config property.</summary>
     public void SaveConfig()
     {
         Config.Save();
     }
 
     /**
-     * <summary>
-     *     Save config EmbeddedResource file (config.yml) to plugin data folder. This does NOT include config changes
-     *     that have been made at runtime (using the Config class)
-     * </summary>
-     * <param name="replace">Is it necessary to replace an existing file</param>
+     * <summary>Saves the config resource file (config.yml) to the plugin data folder.</summary>
+     * <param name="replace">Whether a file needs to be replaced if it already exists.</param>
      */
     public void SaveDefaultConfig(bool replace = false)
     {
