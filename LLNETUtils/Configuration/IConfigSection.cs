@@ -126,6 +126,15 @@ public interface IConfigSection : IEnumerable<KeyValuePair<string, object>>
      * <returns>IList&lt;T&gt; value if the key is found; otherwise, defaultValue.</returns>
      */
     IList<T>? GetList<T>(string key, IList<T>? defaultValue = null);
+    
+    /**
+     * <summary>Returns the IDictionary&lt;string, object&gt; value associated with the specified key.</summary>
+     * <param name="key">The key of the value to return.</param>
+     * <param name="defaultValue">Default value that will be returned if no value
+     * with the specified key is found in the config section.</param>
+     * <returns>IDictionary&lt;string, object&gt; value if the key is found; otherwise, defaultValue.</returns>
+     */
+    IDictionary<string, object>? GetDictionary(string key, IDictionary<string, object>? defaultValue = null);
 
     /**
      * <summary>Returns the IConfigSection value associated with the specified key.</summary>

@@ -294,6 +294,11 @@ public class Config : IConfigSection
         return Root.GetList(key, defaultValue);
     }
 
+    public IDictionary<string, object>? GetDictionary(string key, IDictionary<string, object>? defaultValue = null)
+    {
+        return Root.GetDictionary(key, defaultValue);
+    }
+
     public IConfigSection? GetSection(string key, IConfigSection? defaultValue = null)
     {
         return Root.GetSection(key, defaultValue);

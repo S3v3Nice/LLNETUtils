@@ -56,9 +56,9 @@ public class ConfigSection : IConfigSection
         string[] keys = lastKey.Split('.');
         for (int i = 0; i < keys.Length - 1; i++)
         {
-            IConfigSection newSection = new ConfigSection();
-            lastDict[keys[i]] = newSection;
-            lastDict = newSection.Dictionary;
+            ConfigDictionary dictionary = new();
+            lastDict[keys[i]] = dictionary;
+            lastDict = dictionary;
         }
 
         lastDict[keys[^1]] = value;
@@ -124,12 +124,18 @@ public class ConfigSection : IConfigSection
     public IList<T>? GetList<T>(string key, IList<T>? defaultValue = null)
     {
         var list = GetList(key);
-        return list == null ? defaultValue : list.Cast<T>().ToList();
+        return list?.Cast<T>().ToList() ?? defaultValue;
+    }
+
+    public IDictionary<string, object>? GetDictionary(string key, IDictionary<string, object>? defaultValue = null)
+    {
+        return Get(key, defaultValue);
     }
 
     public IConfigSection? GetSection(string key, IConfigSection? defaultValue = null)
     {
-        return Get(key, defaultValue);
+        ConfigDictionary? dictionary = Get<ConfigDictionary>(key);
+        return dictionary != null ? new ConfigSection(dictionary) : defaultValue;
     }
 
     public IEnumerator<KeyValuePair<string, object>> GetEnumerator()
