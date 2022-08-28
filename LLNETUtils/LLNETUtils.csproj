@@ -7,6 +7,12 @@
         <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
         <AssemblyVersion>1.1.0</AssemblyVersion>
         <Company>S3v3Nice</Company>
+        <PackageVersion>1.1.0</PackageVersion>
+        <Authors>S3v3Nice</Authors>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <RepositoryUrl>https://github.com/S3v3Nice/LLNETUtils</RepositoryUrl>
+        <PackageTags>liteloader, liteloader.net, llnet, utils</PackageTags>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
