@@ -7,6 +7,10 @@ internal class ConfigList : IList<object>, IList, IReadOnlyList<object>
 {
     private readonly List<object> _list = new();
 
+    public ConfigList()
+    {
+    }
+    
     public ConfigList(IEnumerable<object> other)
     {
         foreach (object item in other)
