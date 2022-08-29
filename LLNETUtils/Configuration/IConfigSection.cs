@@ -5,7 +5,8 @@ namespace LLNETUtils.Configuration;
 /// <summary>Interface with methods for reading and editing the config section</summary>
 public interface IConfigSection : IEnumerable<KeyValuePair<string, object>>
 {
-    IDictionary<string, object> Dictionary { get; internal set; }
+    /// <summary>The dictionary on which ConfigSection is based.</summary>
+    IDictionary<string, object> Dictionary { get; }
 
     /// <summary>Removes all items from the config section.</summary>
     void Clear();

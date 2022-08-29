@@ -88,12 +88,6 @@ public class Config : IConfigSection
         }
     }
     
-    IDictionary<string, object> IConfigSection.Dictionary
-    {
-        get => Root.Dictionary;
-        set => Root.Dictionary = value;
-    }
-    
     public IDictionary<string, object> Dictionary => Root.Dictionary;
 
     /**

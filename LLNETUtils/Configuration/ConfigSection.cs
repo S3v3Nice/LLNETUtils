@@ -14,17 +14,11 @@ public class ConfigSection : IConfigSection
     }
 
     /**
-     * <param name="dictionary">The dictionary to take as the base for the config section.</param>
+     * <param name="dictionary">The dictionary on which ConfigSection will be based.</param>
      */
     public ConfigSection(IDictionary<string, object> dictionary)
     {
         _dictionary = dictionary as ConfigDictionary ?? new ConfigDictionary(dictionary);
-    }
-
-    IDictionary<string, object> IConfigSection.Dictionary
-    {
-        get => _dictionary;
-        set => _dictionary = value as ConfigDictionary ?? new ConfigDictionary(value);
     }
 
     public IDictionary<string, object> Dictionary => _dictionary;
