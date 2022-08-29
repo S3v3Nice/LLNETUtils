@@ -93,8 +93,6 @@ public class Config : IConfigSection
             }
         }
     }
-    
-    public IDictionary<string, object> Dictionary => Root.Dictionary;
 
     /**
      * <summary>Reloads the config from a file (by FilePath).</summary>

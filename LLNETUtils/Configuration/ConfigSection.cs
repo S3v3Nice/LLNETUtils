@@ -6,11 +6,11 @@ namespace LLNETUtils.Configuration;
 /// <summary>Class for reading and editing the config section</summary>
 public class ConfigSection : IConfigSection
 {
-    private ConfigDictionary _dictionary;
+    internal readonly ConfigDictionary Dictionary;
 
     public ConfigSection()
     {
-        _dictionary = new ConfigDictionary();
+        Dictionary = new ConfigDictionary();
     }
 
     /**
@@ -18,14 +18,12 @@ public class ConfigSection : IConfigSection
      */
     public ConfigSection(IDictionary<string, object> dictionary)
     {
-        _dictionary = dictionary as ConfigDictionary ?? new ConfigDictionary(dictionary);
+        Dictionary = dictionary as ConfigDictionary ?? new ConfigDictionary(dictionary);
     }
-
-    public IDictionary<string, object> Dictionary => _dictionary;
 
     public void Clear()
     {
-        _dictionary.Clear();
+        Dictionary.Clear();
     }
 
     public bool Contains(string key)
@@ -136,7 +134,7 @@ public class ConfigSection : IConfigSection
 
     public IEnumerator<KeyValuePair<string, object>> GetEnumerator()
     {
-        return _dictionary.GetEnumerator();
+        return Dictionary.GetEnumerator();
     }
 
     IEnumerator IEnumerable.GetEnumerator()
@@ -146,10 +144,10 @@ public class ConfigSection : IConfigSection
 
     bool IConfigSection.Find(string key, out IDictionary<string, object> lastDict, out string lastKey)
     {
-        lastDict = _dictionary;
+        lastDict = Dictionary;
         lastKey = key;
         
-        if (_dictionary.TryGetValue(key, out _))
+        if (Dictionary.TryGetValue(key, out _))
         {
             return true;
         }
@@ -160,7 +158,7 @@ public class ConfigSection : IConfigSection
             string key1 = key[..index];
             string key2 = key[(index + 1)..];
 
-            if (_dictionary.TryGetValue(key1, out object? value) && value is ConfigDictionary dictionary)
+            if (Dictionary.TryGetValue(key1, out object? value) && value is ConfigDictionary dictionary)
             {
                 IConfigSection section = new ConfigSection(dictionary);
 
