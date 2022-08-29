@@ -8,8 +8,7 @@ internal class PropertiesConfigSerializer : IConfigSerializer
 {
     public IConfigSection Deserialize(string data)
     {
-        IConfigSection section = new ConfigSection();
-        var dictionary = section.Dictionary;
+        ConfigDictionary dictionary = new();
 
         foreach (string line in data.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries))
         {
@@ -31,7 +30,7 @@ internal class PropertiesConfigSerializer : IConfigSerializer
             dictionary[key] = ParseValue(value);
         }
 
-        return section;
+        return new ConfigSection(dictionary);
     }
 
     public string Serialize(IConfigSection section)
