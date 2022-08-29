@@ -33,6 +33,7 @@ public class Config : IConfigSection
 
     private IConfigSerializer _serializer;
     private ConfigType _type;
+    private IConfigSection _root;
 
     /**
      * <param name="filePath">Full path to the config file.</param>
@@ -57,8 +58,13 @@ public class Config : IConfigSection
     public string FilePath { get; set; }
     /// <summary>Logger for displaying occurring errors in the console.</summary>
     public Logger? Logger { get; set; }
+
     /// <summary>Root config section.</summary>
-    public IConfigSection Root { get; set; }
+    public IConfigSection Root
+    {
+        get => _root;
+        set => _root = value is Config config ? config.Root : value;
+    }
 
     /// <summary>Configuration format type.</summary>
     public ConfigType Type
