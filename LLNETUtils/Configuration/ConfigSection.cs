@@ -43,7 +43,7 @@ public class ConfigSection : IConfigSection
     {
         if (Find(key, out var lastDict, out string lastKey))
         {
-            lastDict[lastKey] = value;
+            lastDict.SetConfigItem(lastKey, value);
             return;
         }
 
@@ -51,11 +51,11 @@ public class ConfigSection : IConfigSection
         for (int i = 0; i < keys.Length - 1; i++)
         {
             ConfigDictionary dictionary = new();
-            lastDict[keys[i]] = dictionary;
+            lastDict.SetConfigItem(keys[i], dictionary);
             lastDict = dictionary;
         }
 
-        lastDict[keys[^1]] = value;
+        lastDict.SetConfigItem(keys[^1], value);
     }
 
     public bool TryGet<T>(string key, [MaybeNullWhen(false)] out T value)
@@ -112,13 +112,13 @@ public class ConfigSection : IConfigSection
 
     public List<object>? GetList(string key, List<object>? defaultValue = null)
     {
-        ConfigList? list = Get<ConfigList>(key);
-        return ((IList<object>?) list)?.ToList() ?? defaultValue;
+        var list = Get<List<object>>(key);
+        return list?.ToList() ?? defaultValue;
     }
 
     public List<T>? GetList<T>(string key, List<T>? defaultValue = null)
     {
-        ConfigList? list = Get<ConfigList>(key);
+        var list = Get<List<object>>(key);
         return list?.Cast<T>().ToList() ?? defaultValue;
     }
 
@@ -143,7 +143,7 @@ public class ConfigSection : IConfigSection
         return GetEnumerator();
     }
 
-    private bool Find(string key, out IDictionary<string, object> lastDict, out string lastKey)
+    private bool Find(string key, out ConfigDictionary lastDict, out string lastKey)
     {
         lastDict = Dictionary;
         lastKey = key;

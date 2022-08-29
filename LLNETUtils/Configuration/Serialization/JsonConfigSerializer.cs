@@ -93,7 +93,7 @@ internal class JsonConfigSerializer : IConfigSerializer
                     return Read(ref reader, null, options);
                 
                 case JsonTokenType.StartArray:
-                    ConfigList list = new();
+                    List<object> list = new();
                     while (reader.Read() && reader.TokenType != JsonTokenType.EndArray)
                     {
                         list.Add(ExtractValue(ref reader, options));

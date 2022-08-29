@@ -1,5 +1,4 @@
 ﻿using System.Collections;
-using LLNETUtils.Utils;
 
 namespace LLNETUtils.Configuration;
 
@@ -16,7 +15,7 @@ internal class ConfigDictionary : IDictionary<string, object>
     {
         foreach (var pair in other)
         {
-            Add(pair);
+            SetConfigItem(pair.Key, pair.Value);
         }
     }
 
@@ -26,7 +25,7 @@ internal class ConfigDictionary : IDictionary<string, object>
 
         set
         {
-            var keyValuePair = KeyValuePair.Create(c, ConfigUtils.GetNewConfigItem(value));
+            var keyValuePair = KeyValuePair.Create(c, value);
             
             if (_dict.ContainsKey(c))
             {
@@ -75,12 +74,6 @@ internal class ConfigDictionary : IDictionary<string, object>
             return;
         }
 
-        object configItem = ConfigUtils.GetNewConfigItem(item.Value);
-        if (configItem != item.Value)
-        {
-            item = new KeyValuePair<string, object>(item.Key, configItem);
-        }
-
         var node = new LinkedListNode<KeyValuePair<string, object>>(item);
         _dict[item.Key] = node;
         _list.AddLast(node);
@@ -93,7 +86,12 @@ internal class ConfigDictionary : IDictionary<string, object>
             return;
         }
 
-        Add(new KeyValuePair<string, object>(key, ConfigUtils.GetNewConfigItem(value)));
+        Add(new KeyValuePair<string, object>(key, value));
+    }
+
+    public void SetConfigItem(string key, object value)
+    {
+        this[key] = GetConfigItem(value);
     }
 
     public bool Remove(string key)
@@ -148,22 +146,32 @@ internal class ConfigDictionary : IDictionary<string, object>
 
     public Dictionary<string, object> ToDictionary()
     {
-        var newDictionary = new Dictionary<string, object>();
-        foreach (var pair in _list)
-        {
-            object value = pair.Value;
-            if (value is ConfigSection section)
-            {
-                value = section.ToDictionary();
-            }
-            else if (value is ConfigList list)
-            {
-                value = list.ToList();
-            }
-            
-            newDictionary.Add(pair.Key, value);
-        }
+        return _list.ToDictionary(pair => pair.Key, pair => GetSimpleItem(pair.Value));
+    }
 
-        return newDictionary;
+    private object GetSimpleItem(object value)
+    {
+        switch (value)
+        {
+            case ConfigSection section:
+                return section.ToDictionary();
+            case List<object> list:
+                return list.Select(GetSimpleItem).ToList();
+            default:
+                return value;
+        }
+    }
+
+    private object GetConfigItem(object value)
+    {
+        switch (value)
+        {
+            case IDictionary<string, object> dictionary:
+                return new ConfigSection(dictionary);
+            case IEnumerable<object> collection:
+                return collection.Select(GetConfigItem).ToList();
+            default:
+                return value;
+        }
     }
 }
