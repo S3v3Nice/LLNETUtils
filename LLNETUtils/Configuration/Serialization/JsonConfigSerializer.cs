@@ -9,27 +9,27 @@ internal class JsonConfigSerializer : IConfigSerializer
 {
     public ConfigSection Deserialize(string data)
     {
-        JsonSerializerOptions options = new() {Converters = { new ConfigDictionaryConverter() }};
-        ConfigDictionary? result = JsonSerializer.Deserialize<ConfigDictionary>(data, options);
+        JsonSerializerOptions options = new() {Converters = { new ConfigSectionConverter() }};
+        ConfigSection result = JsonSerializer.Deserialize<ConfigSection>(data, options)!;
 
-        return new ConfigSection(result!);
+        return result;
     }
 
     public string Serialize(ConfigSection section)
     {
         JsonSerializerOptions options = new()
         {
-            Converters = { new ConfigDictionaryConverter() },
+            Converters = { new ConfigSectionConverter() },
             WriteIndented = true,
             Encoder = JavaScriptEncoder.Create(UnicodeRanges.All)
         };
 
-        return JsonSerializer.Serialize(section.Dictionary, options);
+        return JsonSerializer.Serialize(section, options);
     }
     
-    private class ConfigDictionaryConverter : JsonConverter<ConfigDictionary>
+    private class ConfigSectionConverter : JsonConverter<ConfigSection>
     {
-        public override ConfigDictionary Read(ref Utf8JsonReader reader, Type? typeToConvert, JsonSerializerOptions options)
+        public override ConfigSection Read(ref Utf8JsonReader reader, Type? typeToConvert, JsonSerializerOptions options)
         {
             if (reader.TokenType != JsonTokenType.StartObject)
             {
@@ -42,7 +42,7 @@ internal class JsonConfigSerializer : IConfigSerializer
             {
                 if (reader.TokenType == JsonTokenType.EndObject)
                 {
-                    return dictionary;
+                    return new ConfigSection(dictionary);
                 }
 
                 if (reader.TokenType != JsonTokenType.PropertyName)
@@ -62,12 +62,12 @@ internal class JsonConfigSerializer : IConfigSerializer
                 dictionary.Add(propertyName, ExtractValue(ref reader, options));
             }
 
-            return dictionary;
+            return new ConfigSection(dictionary);
         }
 
-        public override void Write(Utf8JsonWriter writer, ConfigDictionary value, JsonSerializerOptions options)
+        public override void Write(Utf8JsonWriter writer, ConfigSection value, JsonSerializerOptions options)
         {
-            JsonSerializer.Serialize(writer, value);
+            JsonSerializer.Serialize(writer, value.Dictionary, options);
         }
 
         private object ExtractValue(ref Utf8JsonReader reader, JsonSerializerOptions options)

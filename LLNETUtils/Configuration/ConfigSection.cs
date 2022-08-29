@@ -158,14 +158,10 @@ public class ConfigSection : IConfigSection
             string key1 = key[..index];
             string key2 = key[(index + 1)..];
 
-            if (Dictionary.TryGetValue(key1, out object? value) && value is ConfigDictionary dictionary)
+            if (Dictionary.TryGetValue(key1, out object? value) && value is ConfigSection section &&
+                section.Find(key2, out lastDict, out lastKey))
             {
-                ConfigSection section = new ConfigSection(dictionary);
-
-                if (section.Find(key2, out lastDict, out lastKey))
-                {
-                    return true;
-                }
+                return true;
             }
         }
 
