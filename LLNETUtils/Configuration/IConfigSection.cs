@@ -124,24 +124,24 @@ public interface IConfigSection : IEnumerable<KeyValuePair<string, object>>
     DateTime GetDateTime(string key, DateTime defaultValue = default);
 
     /**
-     * <summary>Returns the IList&lt;object&gt; value associated with the specified key.</summary>
+     * <summary>Returns the List&lt;object&gt; value associated with the specified key.</summary>
      * <param name="key">The key of the value to return.</param>
      * <param name="defaultValue">
      *     Default value that will be returned if no value
      *     with the specified key is found in the config section.
      * </param>
-     * <returns>IList&lt;object&gt; value if the key is found; otherwise, defaultValue.</returns>
+     * <returns>List&lt;object&gt; value if the key is found; otherwise, defaultValue.</returns>
      */
     List<object>? GetList(string key, List<object>? defaultValue = null);
 
     /**
-     * <summary>Returns the IList&lt;T&gt; value associated with the specified key.</summary>
+     * <summary>Returns the List&lt;T&gt; value associated with the specified key.</summary>
      * <param name="key">The key of the value to return.</param>
      * <param name="defaultValue">
      *     Default value that will be returned if no value
      *     with the specified key is found in the config section.
      * </param>
-     * <returns>IList&lt;T&gt; value if the key is found; otherwise, defaultValue.</returns>
+     * <returns>List&lt;T&gt; value if the key is found; otherwise, defaultValue.</returns>
      */
     List<T>? GetList<T>(string key, List<T>? defaultValue = null);
 
