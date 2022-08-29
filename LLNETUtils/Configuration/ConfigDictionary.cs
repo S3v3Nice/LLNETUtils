@@ -145,4 +145,25 @@ internal class ConfigDictionary : IDictionary<string, object>
     {
         return GetEnumerator();
     }
+
+    public Dictionary<string, object> ToDictionary()
+    {
+        var newDictionary = new Dictionary<string, object>();
+        foreach (var pair in _list)
+        {
+            object value = pair.Value;
+            if (value is ConfigSection section)
+            {
+                value = section.ToDictionary();
+            }
+            else if (value is ConfigList list)
+            {
+                value = list.ToList();
+            }
+            
+            newDictionary.Add(pair.Key, value);
+        }
+
+        return newDictionary;
+    }
 }

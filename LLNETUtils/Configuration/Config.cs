@@ -284,23 +284,23 @@ public class Config : IConfigSection
         return Root.GetDateTime(key, defaultValue);
     }
 
-    public IList<object>? GetList(string key, IList<object>? defaultValue = null)
+    public List<object>? GetList(string key, List<object>? defaultValue = null)
     {
         return Root.GetList(key, defaultValue);
     }
 
-    public IList<T>? GetList<T>(string key, IList<T>? defaultValue = null)
+    public List<T>? GetList<T>(string key, List<T>? defaultValue = null)
     {
         return Root.GetList(key, defaultValue);
-    }
-
-    public IDictionary<string, object>? GetDictionary(string key, IDictionary<string, object>? defaultValue = null)
-    {
-        return Root.GetDictionary(key, defaultValue);
     }
 
     public IConfigSection? GetSection(string key, IConfigSection? defaultValue = null)
     {
         return Root.GetSection(key, defaultValue);
+    }
+
+    public Dictionary<string, object> ToDictionary()
+    {
+        return Root.ToDictionary();
     }
 }

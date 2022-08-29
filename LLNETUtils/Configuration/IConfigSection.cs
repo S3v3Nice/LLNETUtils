@@ -132,7 +132,7 @@ public interface IConfigSection : IEnumerable<KeyValuePair<string, object>>
      * </param>
      * <returns>IList&lt;object&gt; value if the key is found; otherwise, defaultValue.</returns>
      */
-    IList<object>? GetList(string key, IList<object>? defaultValue = null);
+    List<object>? GetList(string key, List<object>? defaultValue = null);
 
     /**
      * <summary>Returns the IList&lt;T&gt; value associated with the specified key.</summary>
@@ -143,18 +143,7 @@ public interface IConfigSection : IEnumerable<KeyValuePair<string, object>>
      * </param>
      * <returns>IList&lt;T&gt; value if the key is found; otherwise, defaultValue.</returns>
      */
-    IList<T>? GetList<T>(string key, IList<T>? defaultValue = null);
-
-    /**
-     * <summary>Returns the IDictionary&lt;string, object&gt; value associated with the specified key.</summary>
-     * <param name="key">The key of the value to return.</param>
-     * <param name="defaultValue">
-     *     Default value that will be returned if no value
-     *     with the specified key is found in the config section.
-     * </param>
-     * <returns>IDictionary&lt;string, object&gt; value if the key is found; otherwise, defaultValue.</returns>
-     */
-    IDictionary<string, object>? GetDictionary(string key, IDictionary<string, object>? defaultValue = null);
+    List<T>? GetList<T>(string key, List<T>? defaultValue = null);
 
     /**
      * <summary>Returns the IConfigSection value associated with the specified key.</summary>
@@ -166,4 +155,9 @@ public interface IConfigSection : IEnumerable<KeyValuePair<string, object>>
      * <returns>IConfigSection value if the key is found; otherwise, defaultValue.</returns>
      */
     IConfigSection? GetSection(string key, IConfigSection? defaultValue = null);
+
+    /**
+     * <summary>Creates Dictionary&lt;string, object&gt; from ConfigSection</summary>
+     */
+    Dictionary<string, object> ToDictionary();
 }

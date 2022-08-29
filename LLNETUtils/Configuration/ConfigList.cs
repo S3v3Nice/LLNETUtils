@@ -137,4 +137,25 @@ internal class ConfigList : IList<object>, IList, IReadOnlyList<object>
     {
         _list.RemoveAt(index);
     }
+
+    public List<object> ToList()
+    {
+        var newList = new List<object>();
+        foreach (object item in _list)
+        {
+            object value = item;
+            if (value is ConfigSection section)
+            {
+                value = section.ToDictionary();
+            }
+            else if (value is ConfigList list)
+            {
+                value = list.ToList();
+            }
+            
+            newList.Add(value);
+        }
+
+        return newList;
+    }
 }

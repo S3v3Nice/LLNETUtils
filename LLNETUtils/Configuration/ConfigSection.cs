@@ -110,26 +110,27 @@ public class ConfigSection : IConfigSection
         return Get(key, defaultValue);
     }
 
-    public IList<object>? GetList(string key, IList<object>? defaultValue = null)
+    public List<object>? GetList(string key, List<object>? defaultValue = null)
     {
-        return Get(key, defaultValue);
+        ConfigList? list = Get<ConfigList>(key);
+        return ((IList<object>?) list)?.ToList() ?? defaultValue;
     }
 
-    public IList<T>? GetList<T>(string key, IList<T>? defaultValue = null)
+    public List<T>? GetList<T>(string key, List<T>? defaultValue = null)
     {
-        var list = GetList(key);
+        ConfigList? list = Get<ConfigList>(key);
         return list?.Cast<T>().ToList() ?? defaultValue;
-    }
-
-    public IDictionary<string, object>? GetDictionary(string key, IDictionary<string, object>? defaultValue = null)
-    {
-        return Get(key, defaultValue);
     }
 
     public IConfigSection? GetSection(string key, IConfigSection? defaultValue = null)
     {
         ConfigDictionary? dictionary = Get<ConfigDictionary>(key);
         return dictionary != null ? new ConfigSection(dictionary) : defaultValue;
+    }
+
+    public Dictionary<string, object> ToDictionary()
+    {
+        return Dictionary.ToDictionary();
     }
 
     public IEnumerator<KeyValuePair<string, object>> GetEnumerator()
