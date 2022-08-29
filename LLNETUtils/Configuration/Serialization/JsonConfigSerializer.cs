@@ -7,7 +7,7 @@ namespace LLNETUtils.Configuration.Serialization;
 
 internal class JsonConfigSerializer : IConfigSerializer
 {
-    public IConfigSection Deserialize(string data)
+    public ConfigSection Deserialize(string data)
     {
         JsonSerializerOptions options = new() {Converters = { new ConfigDictionaryConverter() }};
         ConfigDictionary? result = JsonSerializer.Deserialize<ConfigDictionary>(data, options);
@@ -15,7 +15,7 @@ internal class JsonConfigSerializer : IConfigSerializer
         return new ConfigSection(result!);
     }
 
-    public string Serialize(IConfigSection section)
+    public string Serialize(ConfigSection section)
     {
         JsonSerializerOptions options = new()
         {

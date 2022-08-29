@@ -1,16 +1,14 @@
 ﻿using System.Globalization;
-using LLNETUtils.Utils;
 using YamlDotNet.Core;
 using YamlDotNet.Core.Events;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.EventEmitters;
-using YamlDotNet.Serialization.Utilities;
 
 namespace LLNETUtils.Configuration.Serialization;
 
 internal class YamlConfigSerializer : IConfigSerializer
 {
-    public IConfigSection Deserialize(string data)
+    public ConfigSection Deserialize(string data)
     {
         DeserializerBuilder builder = new DeserializerBuilder()
             .WithNodeTypeResolver(new ConfigNodeTypeResolver());
@@ -24,7 +22,7 @@ internal class YamlConfigSerializer : IConfigSerializer
         return new ConfigSection(result);
     }
 
-    public string Serialize(IConfigSection section)
+    public string Serialize(ConfigSection section)
     {
         SerializerBuilder builder = new SerializerBuilder()
             .WithEventEmitter(emitter => new ForceQuoteEventEmitter(emitter));

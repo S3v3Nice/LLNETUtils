@@ -33,7 +33,7 @@ public class Config : IConfigSection
 
     private IConfigSerializer _serializer;
     private ConfigType _type;
-    private IConfigSection _root;
+    private ConfigSection _root;
 
     /**
      * <param name="filePath">Full path to the config file.</param>
@@ -46,7 +46,7 @@ public class Config : IConfigSection
         FilePath = filePath;
         Type = type;
         Logger = logger;
-        Root = new ConfigSection();
+        _root = new ConfigSection();
 
         if (!string.IsNullOrEmpty(filePath))
         {
@@ -63,7 +63,7 @@ public class Config : IConfigSection
     public IConfigSection Root
     {
         get => _root;
-        set => _root = value is Config config ? config.Root : value;
+        set => _root = value is Config config ? config._root : (ConfigSection) value;
     }
 
     /// <summary>Configuration format type.</summary>
@@ -131,7 +131,7 @@ public class Config : IConfigSection
         try
         {
             string data = File.ReadAllText(filePath);
-            Root = _serializer.Deserialize(data);
+            _root = _serializer.Deserialize(data);
         }
         catch (Exception e)
         {
@@ -164,7 +164,7 @@ public class Config : IConfigSection
         {
             using StreamReader streamReader = new(stream);
             string data = streamReader.ReadToEnd();
-            Root = _serializer.Deserialize(data);
+            _root = _serializer.Deserialize(data);
         }
         catch (Exception e)
         {
@@ -206,7 +206,7 @@ public class Config : IConfigSection
             }
         }
 
-        string data = _serializer.Serialize(Root);
+        string data = _serializer.Serialize(_root);
         File.WriteAllText(filePath, data);
         return true;
     }
