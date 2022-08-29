@@ -303,9 +303,4 @@ public class Config : IConfigSection
     {
         return Root.GetSection(key, defaultValue);
     }
-
-    bool IConfigSection.Find(string key, out IDictionary<string, object> dict, out string dictKey)
-    {
-        return Root.Find(key, out dict, out dictKey);
-    }
 }

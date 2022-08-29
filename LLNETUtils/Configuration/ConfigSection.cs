@@ -28,12 +28,12 @@ public class ConfigSection : IConfigSection
 
     public bool Contains(string key)
     {
-        return ((IConfigSection) this).Find(key, out _, out _);
+        return Find(key, out _, out _);
     }
 
     public void Remove(string key)
     {
-        if (((IConfigSection) this).Find(key, out var lastDict, out string lastKey))
+        if (Find(key, out var lastDict, out string lastKey))
         {
             lastDict.Remove(lastKey);
         }
@@ -41,7 +41,7 @@ public class ConfigSection : IConfigSection
 
     public void Set(string key, object value)
     {
-        if (((IConfigSection) this).Find(key, out var lastDict, out string lastKey))
+        if (Find(key, out var lastDict, out string lastKey))
         {
             lastDict[lastKey] = value;
             return;
@@ -60,7 +60,7 @@ public class ConfigSection : IConfigSection
 
     public bool TryGet<T>(string key, [MaybeNullWhen(false)] out T value)
     {
-        if (((IConfigSection) this).Find(key, out var lastDict, out string lastKey) && lastDict[lastKey] is T v)
+        if (Find(key, out var lastDict, out string lastKey) && lastDict[lastKey] is T v)
         {
             value = v;
             return true;
@@ -142,7 +142,7 @@ public class ConfigSection : IConfigSection
         return GetEnumerator();
     }
 
-    bool IConfigSection.Find(string key, out IDictionary<string, object> lastDict, out string lastKey)
+    private bool Find(string key, out IDictionary<string, object> lastDict, out string lastKey)
     {
         lastDict = Dictionary;
         lastKey = key;
@@ -160,7 +160,7 @@ public class ConfigSection : IConfigSection
 
             if (Dictionary.TryGetValue(key1, out object? value) && value is ConfigDictionary dictionary)
             {
-                IConfigSection section = new ConfigSection(dictionary);
+                ConfigSection section = new ConfigSection(dictionary);
 
                 if (section.Find(key2, out lastDict, out lastKey))
                 {

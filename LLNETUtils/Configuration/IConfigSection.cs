@@ -166,6 +166,4 @@ public interface IConfigSection : IEnumerable<KeyValuePair<string, object>>
      * <returns>IConfigSection value if the key is found; otherwise, defaultValue.</returns>
      */
     IConfigSection? GetSection(string key, IConfigSection? defaultValue = null);
-
-    internal bool Find(string key, out IDictionary<string, object> lastDict, out string lastKey);
 }
