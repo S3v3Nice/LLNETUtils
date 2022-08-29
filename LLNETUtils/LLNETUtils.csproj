@@ -5,18 +5,20 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
-        <AssemblyVersion>1.1.0</AssemblyVersion>
+        <AssemblyVersion>1.2.0</AssemblyVersion>
         <Company>S3v3Nice</Company>
-        <PackageVersion>1.1.0</PackageVersion>
+        <PackageVersion>1.2.0</PackageVersion>
         <Authors>S3v3Nice</Authors>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <RepositoryUrl>https://github.com/S3v3Nice/LLNETUtils</RepositoryUrl>
-        <PackageTags>liteloader, liteloader.net, llnet, utils</PackageTags>
+        <RepositoryType>git</RepositoryType>
+        <PackageTags>liteloader;liteloader.net;llnet;utils</PackageTags>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
       <DocumentationFile>bin\Release\LLNETUtils.xml</DocumentationFile>
+      <NoWarn>1701;1702;1591</NoWarn>
     </PropertyGroup>
 
     <ItemGroup>
