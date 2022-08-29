@@ -13,9 +13,12 @@ Library for [LiteLoader.NET](https://github.com/LiteLDev/LiteLoader.NET) for eas
 
 ## Get started
 
+To start working with the library, you can add the NuGet package [LLNETUtils](https://www.nuget.org/packages/LLNETUtils/) to your project. Or you can do the following:
+
 1. **[Optional]** Copy the documentation file `LLNETUtils.xml` (from [Releases](https://github.com/S3v3Nice/LLNETUtils/releases)) to the folder with `LLNETUtils.dll`
 2. Add `LLNETUtils.dll` to the project references
-3. Make your main plugin class inherit the `PluginBase` class:
+
+Next make your main plugin class inherit the `PluginBase` class:
 
 ```csharp
 [PluginMain("Plugin name")]

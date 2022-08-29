@@ -13,9 +13,12 @@
 
 ## Начало работы
 
+Чтобы начать работу с библиотекой, вы можете добавить NuGet пакет [LLNETUtils](https://www.nuget.org/packages/LLNETUtils/) в свой проект. Либо сделайте следующее:
+
 1. **[Необязательно]** Скопируйте документационный файл `LLNETUtils.xml` (из [Releases](https://github.com/S3v3Nice/LLNETUtils/releases)) в папку с `LLNETUtils.dll`
 2. Добавьте в своем проекте ссылку на `LLNETUtils.dll`
-3. Сделайте так, чтобы ваш основной класс плагина наследовал класс `PluginBase`:
+
+Затем сделайте так, чтобы ваш основной класс плагина наследовал класс `PluginBase`:
 
 ```csharp
 [PluginMain("Название плагина")]
