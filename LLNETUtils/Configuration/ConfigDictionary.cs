@@ -170,6 +170,8 @@ internal class ConfigDictionary : IDictionary<string, object>
                 return new ConfigSection(dictionary);
             case IEnumerable<object> collection:
                 return collection.Select(GetConfigItem).ToList();
+            case Config config:
+                return config.Root;
             default:
                 return value;
         }
